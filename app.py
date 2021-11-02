@@ -1,6 +1,9 @@
-from flask import Flask, redirect, render_template, request
+from flask import Flask, redirect, render_template, request, session
 import csv
 app = Flask(__name__)
+
+# Key for signing the cookies
+app.secret_key = "SANDY_CANYON_SUNSET"
 
 # Global Variables
 # timestable that was selected
@@ -34,9 +37,12 @@ def login():
         username_entered = request.form.get("username")
         if username_entered in users and request.form.get("password") == users[username_entered]:
 
+            # Saving username in session cookie
+            session["username"] = username_entered
+
             # Saving username in global variable
-            global username
-            username = username_entered
+            #global username
+            #username = username_entered
 
             # Changing message, ready for next login
             global login_message
@@ -47,7 +53,9 @@ def login():
     else:    
         global register_message
         register_message = "Register"
-        username = ""   # In case we were redirected here after logout
+        if "username" in session:
+            session.pop("username", default=None) # Deleting username in case we were redirected here after logout
+        #username = ""   # In case we were redirected here after logout
         return render_template("login.html", login_message = login_message)
 
 @app.route("/register", methods=["GET", "POST"])
@@ -115,7 +123,9 @@ def register():
 
 @app.route("/select", methods=["GET", "POST"])
 def select():
-    if username == "":
+    
+    if not "username" in session:
+    #if username == "":
         return redirect("/login")
     else:
         if request.method == "POST":
@@ -135,23 +145,25 @@ def select():
             with open("data/medals.csv", "r", newline="") as medalsfile:
                 medalsreader = csv.reader(medalsfile, delimiter=" ")
                 for row in medalsreader:
-                    if row[0] == username:
-                        global user_medals_str
+                    if row[0] == session["username"]:
+                    #if row[0] == username:
+                        #global user_medals_str
                         user_medals_str = ""
                         for i in range(11):
                             user_medals_str += (row[i + 1])
 
             # Loading page
-            return render_template("select.html", username = username, tts = range(3, 13), medals = user_medals_str)
+            return render_template("select.html", username = session["username"], tts = range(3, 13), medals = user_medals_str)
     
 
 @app.route("/test", methods=["GET", "POST"])
 def test():
-    if username == "":
+    if not "username" in session:
+    #if username == "":
         return redirect("/login")
     else:
         if request.method == "GET":
-            return render_template("test.html", timestable = tt, username = username)
+            return render_template("test.html", timestable = tt, username = session["username"])
         else:
             # Receiving which medal was won, when timestable test was completed
             medal_earned = request.form.get("medal_earned")
@@ -166,7 +178,7 @@ def test():
 
                 # Updating all_medals with the medal earned from current user and current timestable
                 for row in all_medals:
-                    if row[0] == username:
+                    if row[0] == session["username"]:
                         row[tt - 1] = medal_earned
 
                 # Overwriting content of CSV file with updated all_medals
@@ -178,14 +190,13 @@ def test():
             return redirect("/select")
 
 
-
-
 @app.route("/practise", methods=["GET", "POST"])
 def practise():
-    if username == "":
+    if not "username" in session:
+    #if username == "":
         return redirect("/login")
     else:
-        return render_template("practise.html", timestable = tt, username = username)
+        return render_template("practise.html", timestable = tt, username = session["username"])
 
 if __name__ == "__main__":
     app.run()
