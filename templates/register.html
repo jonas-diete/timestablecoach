@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block main %}
+    <div class = "narrow_row">
+        <div class="intro_text">
+            {{ register_message }}
+            <br>
+            <br>
+        </div>
+    </div>
+
+    <div class = "narrow_row">
+        <form action="/register" method="post">
+            <input autofocus autocomplete="off" type="text" name="username" placeholder="Choose a Username"><br>
+            <input autofocus autocomplete="off" type="password" name="password1" placeholder="Choose a Password"><br>
+            <input autofocus autocomplete="off" type="password" name="password2" placeholder="Retype your Password"><br>
+            <button type="submit" class="select_button" id="register_button">Register</button>
+        </form>
+        <br>
+        <br>
+        <br>
+        <form action="/login" method="get">
+            <button type="submit" id="back_to_login_button"></button>
+        </form>
+    </div>
+{% endblock %}

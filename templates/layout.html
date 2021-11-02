@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="eng">
+    <head>
+        <link href="/static/styles.css" rel="stylesheet">
+        {% block head %}{% endblock %}
+        <title>
+            Times Table Coach
+        </title>
+    </head>
+
+    <body>
+        <header>
+            <div class = "row">
+                <div id="title"><img id="title_img" src="/static/images/title_long.png"></div>
+            </div>
+            <br>
+        </header>
+
+        <main>
+            {% block main %}{% endblock %}
+        </main>
+
+        <footer>
+            <br>
+            <br>
+            <div class = "row">
+                <h5>Application designed and created by &copy Jonas Diete.</h5>
+            </div>
+        </footer>
+    </body>
+</html>

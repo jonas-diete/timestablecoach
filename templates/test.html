@@ -1,0 +1,305 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <script>
+        
+        // function to randomise(shuffle) an array
+        function shuffle(array) {
+            var currentIndex = array.length,  randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        function resetting() {
+            
+        }
+        // Creating and shuffling factor array
+        var factors = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+        shuffle(factors);
+
+        // Initialising other variables
+        var question_number = 0;
+        var num_of_corr_answers = 0;
+        var game_started = false;
+        var time = 300;        
+        var wrong_questions = [];
+        var medal_earned = 0;
+
+        function create_question() {
+            var corr_answer = factors[question_number] * tt;
+            document.querySelector('#display').innerHTML = factors[question_number] + ' x ' + tt;
+        
+            return corr_answer;
+        }
+
+        // This function is called 2000ms after the tick or cross are displayed, to hide them again.
+        function right_wrong_timeout() {
+            document.querySelector('#right_wrong').style.display = 'none';
+        }
+
+        function check_answer(corr_answer) {
+            var answer = document.querySelector('#answer').value;
+            if (answer.length == String(corr_answer).length)
+            {
+                // Answer is correct
+                if (answer == corr_answer) {
+                    document.querySelector('#right_wrong').src = '/static/images/tick.png';
+                    document.querySelector('#right_wrong').style.display = 'block';
+                    // Checking if a timer has been started and clearing it first before starting a new one
+                    if (typeof right_wrong_timer !== 'undefined') { 
+                        clearInterval(right_wrong_timer);
+                    }
+                    right_wrong_timer = setTimeout(right_wrong_timeout, 2000);
+                    num_of_corr_answers++;
+
+                    // Displaying in progress bar
+                    if (question_number == 0) {
+                        document.querySelector('#progress' + question_number).src="/static/images/counter1_corr.png";
+                    }
+                    else if (question_number == 11) {
+                        document.querySelector('#progress' + question_number).src="/static/images/counter_last_corr.png";
+                    }
+                    else {
+                        document.querySelector('#progress' + question_number).src="/static/images/counter_mid_corr.png";
+                    }
+                    
+                }
+
+                // Answer is wrong
+                else { 
+                    wrong_questions.push(factors[question_number]);
+                    document.querySelector('#right_wrong').src = '/static/images/cross.png';
+                    document.querySelector('#right_wrong').style.display = 'block';
+                    if (typeof right_wrong_timer !== 'undefined') {
+                        clearInterval(right_wrong_timer);
+                    }
+                    right_wrong_timer = setTimeout(right_wrong_timeout, 2000);
+                    
+                    // Displaying in progress bar
+                    if (question_number == 0) {
+                        document.querySelector('#progress' + question_number).src="/static/images/counter1_wrong.png";
+                    }
+                    else if (question_number == 11) {
+                        document.querySelector('#progress' + question_number).src="/static/images/counter_last_wrong.png";
+                    }
+                    else {
+                        document.querySelector('#progress' + question_number).src="/static/images/counter_mid_wrong.png";
+                    }
+                }
+
+                // Activating next question on progress bar
+                if (question_number == 10) {
+                    document.querySelector('#progress11').src="/static/images/counter_last_active.png";
+                }
+                else if (question_number < 10) {
+                    document.querySelector('#progress' + (question_number + 1)).src="/static/images/counter_mid_active.png";
+                }
+                
+                return true;    // So we know an answer has been checked          
+            }
+            
+
+        }
+
+        function finish() {
+
+            // Displaying message
+            document.querySelector('#display').style.fontSize = '20px';
+            if (num_of_corr_answers > 11 && time > 49) {
+                document.querySelector('#display').innerHTML = 'Congratulations.<br>You earned a gold medal!';
+                medal_earned = 3;
+            }
+
+            else if (num_of_corr_answers > 11) {
+                document.querySelector('#display').innerHTML = 'Congratulations.<br>You earned a silver medal!';
+                medal_earned = 2;
+            }
+
+            else if (num_of_corr_answers > 10) {
+                document.querySelector('#display').innerHTML = 'Congratulations.<br>You earned a bronze medal.<br>Revise this question:<br>' + wrong_questions[1] + ' x ' + tt + ' = ' + wrong_questions[1]*tt; 
+                medal_earned = 1;
+            }
+
+            else if (num_of_corr_answers > 9) {
+                document.querySelector('#display').innerHTML = 'Congratulations.<br>You earned a bronze medal.<br>Revise these questions:<br>' + wrong_questions[1] + ' x ' + tt + ' = ' + wrong_questions[1]*tt + '<br>' + wrong_questions[2] + ' x ' + tt + ' = ' + wrong_questions[2]*tt;
+                medal_earned = 1;
+            }
+
+            else {
+                document.querySelector('#display').innerHTML = 'You got ' + num_of_corr_answers + ' answers correct.<br>Keep on practising.';
+            }
+
+            // Sending the medal result
+            var data = new FormData();
+            data.append('medal_earned', medal_earned);
+            var request = new XMLHttpRequest();
+            request.open('POST', '/test');
+            request.send(data);
+
+
+            // Disabling answer text box, displaying start button
+            document.querySelector('#answer').disabled = true;
+            document.querySelector('#answer').style.backgroundImage = "url('/static/images/answerbox_inactive.png')";
+            document.querySelector('#main_button').style.display = 'block';
+            document.querySelector('#main_button').innerHTML = 'Play Again'
+
+            // Stopping timer
+            clearInterval(timer);
+            
+            // Resetting other variables
+            shuffle(factors);
+            medal_earned = 0;
+            question_number = 0;
+            num_of_corr_answers = 0;
+            game_started = false;
+            wrong_questions = [tt]; //emptying wrong_questions except for tt
+        }
+
+        // Is called every tenth of a second
+        function change_time() {        
+            if (game_started == true) {
+                
+                time--;
+                
+                // Shrinking the timer bar, every tenth of a second
+                document.querySelector('#timerbar').style.height = (355 / 300 * (time)) + 'px';
+                document.querySelector('#timerbar').style.top = (77 + (355 / 300 * (300-time))) + 'px';
+                
+                // Updating the timer every second
+                if (time % 10 == 0 && time != 0) {
+                    if (time > 90) {
+                        document.querySelector('#timer').innerHTML = '0:' + (time / 10);
+                    }
+                    else if (time > 0) {
+                        document.querySelector('#timer').innerHTML = '0:0' + (time / 10);
+                    }
+                }
+                else if (time == 0) {
+                    finish();
+                }
+            }
+            
+        }
+    
+        // When the site is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // Declaring global tt variable (passed into html with jinja)
+            tt = parseInt(document.querySelector('#tt').innerHTML);
+            
+            // Adding the timestable to the wrong answers array, so we know later which tt the factors refer to.
+            wrong_questions.push(tt); 
+            
+            // Disabling answer text box
+            document.querySelector('#answer').disabled = true;
+
+            // Hiding tick and cross (rightwrong)
+            document.querySelector('#right_wrong').style.display = "none";
+
+            // When a key is pressed
+            document.querySelector('#answer').addEventListener('keyup', function() {
+                if (game_started) {
+                    // checking answer, returning true if it has been checked
+                    if (check_answer(corr_answer)) {
+                        document.querySelector('#answer').value = '';
+                        
+                        if (question_number < 11) {
+                            question_number++;
+                            corr_answer = create_question();
+                            document.querySelector('#answer').focus();
+                        }
+                        else {                            
+                            finish();
+                        }
+                    }
+                }    
+
+            });
+
+            // When main button is clicked
+            document.querySelector('#main_button').addEventListener('click', function() {
+                // Game gets started
+                game_started = true;
+
+                //Hiding main button, enabling & focusing answer box
+                document.querySelector('#main_button').style.display = 'none';
+                document.querySelector('#answer').disabled = false;
+                document.querySelector('#answer').focus();
+                document.querySelector('#answer').style.backgroundImage = "url('/static/images/answerbox.png')";
+
+                document.querySelector('#right_wrong').innerHTML = '';
+                document.querySelector('#display').style.fontSize = 'xx-large';
+
+                // Activating and emptying progress bar
+                document.querySelector('#progress0').src="/static/images/counter1_active.png";
+                document.querySelector('#progress11').src="/static/images/counter_last.png";
+                for (var i = 1; i < 11; i++) {
+                    document.querySelector('#progress' + i).src="/static/images/counter_mid.png";
+                }
+
+                // Starting timer
+                document.querySelector('#timer').innerHTML = '0:30';
+                time = 300;
+                timer = setInterval(change_time, 100); // This variable is automatically global, as it isn't created using var or let.
+
+                // Create first question
+                corr_answer = create_question();
+            });
+        });
+
+    </script>
+{% endblock %}
+
+{% block main %}
+    <br>
+    <div class="row">
+
+        <div class="col" id="col1">
+            <div id="userbackground">{{username}}</div> 
+            <div id="ttbackground"><b id="tt">{{timestable}}</b><b>x</b></div>
+            <form id="back_button_form">
+                <button id="back_button" type="submit" formaction="/select" formmethod="GET"></button>
+            </form>
+        </div>
+
+        <div class="col" id="col2">
+            <!-- Images for displaying progress bar -->
+            <img src="/static/images/counter_last_inactive.png" class="progress" id="progress11" alt="progress_bar">
+            <img src="/static/images/counter_mid.png" class="progress" id="progress10" alt="progress_bar">
+            <img src="/static/images/counter_mid.png" class="progress" id="progress9" alt="progress_bar">
+            <img src="/static/images/counter_mid.png" class="progress" id="progress8" alt="progress_bar">
+            <img src="/static/images/counter_mid.png" class="progress" id="progress7" alt="progress_bar">
+            <img src="/static/images/counter_mid.png" class="progress" id="progress6" alt="progress_bar">
+            <img src="/static/images/counter_mid.png" class="progress" id="progress5" alt="progress_bar">
+            <img src="/static/images/counter_mid.png" class="progress" id="progress4" alt="progress_bar">
+            <img src="/static/images/counter_mid.png" class="progress" id="progress3" alt="progress_bar">
+            <img src="/static/images/counter_mid.png" class="progress" id="progress2" alt="progress_bar">
+            <img src="/static/images/counter_mid.png" class="progress" id="progress1" alt="progress_bar">
+            <img src="/static/images/counter1_inactive.png" class="progress" id="progress0" alt="progress_bar">
+        </div>
+
+        <div class="col" id="col3">
+            <div id="display">Welcome!<br>Use your keypad<br>to type in answers.</div>
+            <div><img src="/static/images/equals.png" id="equals"></div>
+            <div id="answer_plus_main_button">
+                <input id="answer" type="text" autofocus autocomplete="off">
+                <button id="main_button" type="button">Start Game</button>
+            </div>
+            <img src="/static/images/tick.png" id="right_wrong">
+        </div>
+
+        <div class="col" id="col4">
+            <div id="timerframe">
+                <div id="timerbar"></div>
+                <div id="timer">0:30</div>
+            </div>
+        </div>
+
+    </div>
+    <br>
+    <br>
+{% endblock %}

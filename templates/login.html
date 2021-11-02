@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block main %}
+    <div class="narrow_row">    
+        <div class="intro_text">
+            {{ login_message }}
+            <br>
+            <br>
+        </div>
+    </div>
+
+    <div class="narrow_row"> 
+        <form action="/login" method="POST">
+            <input autofocus autocomplete="off" type="text" name="username" placeholder="Username">
+            <br>
+            <input autocomplete="off" type="password" name="password" placeholder="Password">
+            <br>
+            <button type="submit" class="select_button" id="login_button">Login</button>
+        </form>
+        <br>
+        <br>
+        <br>
+    </div>
+
+    <div class="narrow_row"> 
+        <form action="/register" method="get">
+            <button type="submit" class="select_button" id="to_register_button">Register</button>
+        </form>
+    </div>
+    
+{% endblock %}
