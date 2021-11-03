@@ -137,7 +137,7 @@
             var data = new FormData();
             data.append('medal_earned', medal_earned);
             var request = new XMLHttpRequest();
-            request.open('POST', '/test');
+            request.open('POST', '/test/' + tt);
             request.send(data);
 
 
