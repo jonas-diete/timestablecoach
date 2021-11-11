@@ -12,6 +12,8 @@ def index():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
+        if request.form.get("accepted") == "yes":
+            session["cookies"] = "yes"
         # Reading CSV file and creating a users dictionary with usernames and passwords
         users = {}
         with open("data/users.csv", "r", newline="") as usernamefile:
@@ -20,20 +22,31 @@ def login():
                 if row:     # This is checking if the row is "true", i.e. not empty
                     users[row[0]] = row[1]
         
-        # checking if username is in users and if the password is matching
-        username_entered = request.form.get("username")
-        if username_entered in users and request.form.get("password") == users[username_entered]:
+        # Checking if cookies have been accepted
+        if "cookies" in session:   
 
-            # Saving username in session cookie
-            session["username"] = username_entered
-
-            return redirect("/select")
+            # checking if username is in users and if the password is matching 
+            username_entered = request.form.get("username")
+            if username_entered in users and request.form.get("password") == users[username_entered]:
+                
+                # Saving username in session cookie
+                session["username"] = username_entered
+                return redirect("/select")
+            else:
+                return render_template("login.html", login_message = "Incorrect username or password. Try again.", cookies = "yes")
         else:
-            return render_template("login.html", login_message = "Incorrect username or password. Try again.")
+            return render_template("login.html", login_message = "You must accept the cookies to continue.", cookies = "")
+    
     else:    
+        # Deleting username in case we were redirected here after logout
         if "username" in session:
-            session.pop("username", default=None) # Deleting username in case we were redirected here after logout
-        return render_template("login.html", login_message = "Enter your login details.")
+            session.pop("username", default=None) 
+
+        # Checking if user has accepted cookies
+        if "cookies" in session:
+            return render_template("login.html", login_message = "Enter your login details.", cookies = "yes")
+        else:
+            return render_template("login.html", login_message = "Enter your login details.", cookies = "")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -49,7 +62,10 @@ def register():
             for row in userreader:
                 if row:     # This is checking if the row is "true", i.e. not empty
                     users[row[0]] = row[1]
-        if new_username in users:
+        if request.form.get("agreement") != "agreed":
+            return render_template("register.html", register_message = "Please accept the Terms and Conditions.")
+
+        elif new_username in users:
             return render_template("register.html", register_message = "Username exists already. Try again.")
         
         # Checking if username is alphanumeric
@@ -85,10 +101,18 @@ def register():
                 medalswriter = csv.writer(medalsfile, delimiter=" ")
                 medalswriter.writerow([new_username, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) 
 
-            return render_template("login.html", login_message = "New user created. Please Login.")              
+            # Checking if user has accepted cookies
+            if "cookies" in session:
+                return render_template("login.html", login_message = "New user created. Please Login.", cookies = "yes")
+            else:
+                return render_template("login.html", login_message = "New user created. Please Login.", cookies = "")             
         
     else:
         return render_template("register.html", register_message = "Register a new user.")
+
+@app.route("/terms", methods=["GET"])
+def terms():
+    return render_template('terms.html')
 
 @app.route("/select", methods=["GET", "POST"])
 def select():
@@ -133,7 +157,7 @@ def test(tt):
             medal_earned = request.form.get("medal_earned")
             
             if int(medal_earned) > 0:
-                # Saving all medals from all users from file into all_medals
+                # Saving all medals from all users from file into all_medals variable
                 all_medals = []
                 with open("data/medals.csv", "r", newline="") as medalsfile:
                     medalsreader = csv.reader(medalsfile, delimiter=" ")
@@ -142,14 +166,15 @@ def test(tt):
 
                 # Updating all_medals with the medal earned from current user and current timestable
                 for row in all_medals:
-                    if row[0] == session["username"]:
+                    # Checking if new medal is actually better than the old one
+                    if row[0] == session["username"] and row[int(tt) - 1] < medal_earned:
                         row[int(tt) - 1] = medal_earned
 
-                # Overwriting content of CSV file with updated all_medals
-                with open("data/medals.csv", "w", newline="") as medalsfile:
-                    medalswriter = csv.writer(medalsfile, delimiter=" ")
-                    for row in all_medals:
-                        medalswriter.writerow(row)
+                        # Overwriting content of CSV file with updated all_medals
+                        with open("data/medals.csv", "w", newline="") as medalsfile:
+                            medalswriter = csv.writer(medalsfile, delimiter=" ")
+                            for row in all_medals:
+                                medalswriter.writerow(row)
 
             return redirect("/select") # Doesn't work! Getting back with back button instead.
 
@@ -159,7 +184,31 @@ def practise(tt):
     if not "username" in session:
         return redirect("/login")
     else:
-        return render_template("practise.html", timestable = tt, username = session["username"])
+        return render_template("practise.html", timestable = int(tt), username = session["username"], numbers = range(1,13))
+
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+    if request.method == "POST":
+        if request.form.get("admin_username") == "bohemian" and request.form.get("admin_pw") == "I0AM&fr3e":
+            
+            # Getting all the data
+            user_data = []
+            with open("data/users.csv", "r", newline="") as usersfile:
+                usersreader = csv.reader(usersfile, delimiter=" ")
+                for row in usersreader:
+                    user_data.append(row)
+
+            medal_data = []
+            with open("data/medals.csv", "r", newline="") as medalsfile:
+                medalsreader = csv.reader(medalsfile, delimiter=" ")
+                for row in medalsreader:
+                    medal_data.append(row)
+
+            return render_template("data.html", user_data = user_data, medal_data = medal_data)
+        else:
+            return render_template("admin.html")
+    else:
+        return render_template("admin.html")
 
 if __name__ == "__main__":
     app.run()

@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block main %}
+
+	<br>
+	{% for user in user_data %}
+		{% for element in user %}
+			{{element}}
+		{% endfor %}
+	<br>
+	{% endfor %}
+
+	<br>
+	<br>
+	<br>
+	{% for user in medal_data %}
+		{% for element in user %}
+			{{element}}
+		{% endfor %}
+	<br>
+	{% endfor %}
+
+
+{% endblock %}

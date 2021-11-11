@@ -1,9 +1,37 @@
 {% extends "layout.html" %}
 
 {% block main %}
-    PRACTISE SECTION --- UNDER CONSTRUCTION
-
     <form>
         <button type="submit" id="back_button" formaction="/select" formmethod="GET"></button>
     </form>
+
+ 	<div class="row">
+	    
+	    <div class="col" id="col1_practise">
+		    <table>
+		    	{% for number in numbers %}
+		    		<tr>
+		    			<td>
+					    	<span id="{{number}}_question">{{number}} x {{timestable}} =</span> 
+				    	</td>
+				    	<td>
+				    		<span id="{{number}}_answer">{{number * timestable}}</span>
+				    	</td>
+			    	</tr>
+			    {% endfor %}
+			</table>
+	    </div>
+	
+
+	    <div class="col" id="col2_practise">
+            <div id="display">PRACTISE SECTION<br>-- Under Construction --</div>
+            <div><img src="/static/images/equals.png" id="equals"></div>
+            <div id="answer_plus_main_button">
+                <input id="answer" type="text" autofocus autocomplete="off">
+                <button id="main_button" type="button">---</button>
+            </div>
+            <img src="/static/images/tick.png" id="right_wrong">
+        </div>
+    
+    </div>
 {% endblock %}

@@ -115,7 +115,46 @@ input[type=text]:focus, input[type=password]:focus {
     background-size: cover;
 }
 
+#agreement_label {
+    font-size: 14px;
+}
+
 /* ------------- LOGIN SCREEN -------------- */
+
+#cookie_consent {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    width: 300px;
+    padding-top: 7px;
+    height: 160px;
+    color: #fff;
+    text-align: center;
+    line-height: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 16px;
+    background: #292929;
+    z-index: 120;
+    border-radius: 3px;
+}
+
+#accept_button {
+    margin: 10px 0;
+    height: 40px;
+    width: 150px;
+    color: #fff;
+    font-size: 20px;
+    line-height: 10px;
+    border-radius: 0px;
+    border: 3px solid white;
+    background-color: #309901;
+}
+
+#accept_button:hover {
+    color: #fff;
+    background-color: gray;
+}
 
 #login_button, #to_register_button {
     margin: 15px 15px 15px 75px;
@@ -146,7 +185,7 @@ input[type=text]:focus, input[type=password]:focus {
     height: 0;
   }
 
-label {
+[type=radio] + label {
     float: left;
 }
 
@@ -404,4 +443,25 @@ label {
     margin: 0;
     padding: 0;
     width: 70px;
+}
+
+/* ------------- PRACTISE SCREEN -----------------*/
+
+#col1_practise {
+    width: 30%;
+}
+
+#col2_practise {
+    width: 50%;
+}
+
+#col1_practise table {
+    border: 3px solid white;
+    font-size: 24px;
+    border-collapse: collapse;
+}
+
+#col1_practise td {
+    border: 1px solid #309901;
+    padding: 5px 10px;
 }

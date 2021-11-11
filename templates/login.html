@@ -1,11 +1,52 @@
 {% extends "layout.html" %}
 
+{% block head %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // if cookies had already been accepted before
+            if (document.getElementById('cookies_accepted').innerHTML == "yes") {
+                
+                // Hiding cookie notification
+                document.getElementById('cookie_consent').style.display='none';
+            }
+            else {
+                document.getElementById('accept_button').addEventListener('click', function() {
+                
+                    // Hiding cookie notification
+                    document.getElementById('cookie_consent').style.display='none';
+
+                    // Sending data that cookies have been accepted
+                    var data = new FormData();
+                    data.append('accepted', 'yes');
+                    var request = new XMLHttpRequest();
+                    request.open('POST', '/login');
+                    request.send(data);
+                })
+            }
+            
+        })
+    </script>
+{% endblock %}
+
 {% block main %}
     <div class="narrow_row">    
         <div class="intro_text">
             {{ login_message }}
             <br>
             <br>
+        </div>
+    </div>
+
+    <div id="cookie_consent"> 
+        <span>
+            <span id="cookies_accepted">{{cookies}}</span> 
+            This site uses only essential cookies, which enable you to stay logged in across the next few pages. 
+            <br>
+            If you don't wish to use cookies, please leave this website now.
+        </span>
+        <div> 
+            <button id="accept_button">Accept</button> 
         </div>
     </div>
 
@@ -23,7 +64,7 @@
     </div>
 
     <div class="narrow_row"> 
-        <form action="/register" method="get">
+        <form action="/register" method="GET">
             <button type="submit" class="select_button" id="to_register_button">Register</button>
         </form>
     </div>

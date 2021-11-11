@@ -14,10 +14,11 @@
             <input autofocus autocomplete="off" type="text" name="username" placeholder="Choose a Username"><br>
             <input autofocus autocomplete="off" type="password" name="password1" placeholder="Choose a Password"><br>
             <input autofocus autocomplete="off" type="password" name="password2" placeholder="Retype your Password"><br>
+            <input type="checkbox" id="agreement" name="agreement" value="agreed">
+            <label for="agreement" id="agreement_label">I accept the <a href="/terms" target="_blank">Terms and Conditions</a>.
+            </label><br>
             <button type="submit" class="select_button" id="register_button">Register</button>
         </form>
-        <br>
-        <br>
         <br>
         <form action="/login" method="get">
             <button type="submit" id="back_to_login_button"></button>
