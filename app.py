@@ -1,6 +1,5 @@
 from flask import Flask, redirect, render_template, request, session
 import csv
-import requests
 import io
 from github import Github
 app = Flask(__name__)
