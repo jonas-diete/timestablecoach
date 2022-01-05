@@ -226,10 +226,6 @@ input[type=text]:focus, input[type=password]:focus {
     width: 70%
 }
 
-#practise_button {
-    opacity: 40%;
-}
-
 #help_imgs {
     margin: 0 0 0 40px;
 }
@@ -354,6 +350,15 @@ input[type=text]:focus, input[type=password]:focus {
     left: 80px;
 }
 
+#main_button:hover {
+    background: url('/static/images/main_button_hover.png') no-repeat;
+    background-size: cover;
+}
+
+#main_button:focus {
+    outline: none;
+}
+
 #answer:focus {
     outline: none;
 }
@@ -366,10 +371,7 @@ input[type=text]:focus, input[type=password]:focus {
     width: 100px;
 }
 
-#main_button:hover {
-    background: url('/static/images/main_button_hover.png') no-repeat;
-    background-size: cover;
-}
+
 
 /* Inherits from #col1 */
 #back_button_form {
@@ -447,6 +449,14 @@ input[type=text]:focus, input[type=password]:focus {
 
 /* ------------- PRACTISE SCREEN -----------------*/
 
+#learningdata {
+    display: none;
+}
+
+#practise_tt {
+    display: none;
+}
+
 #col1_practise {
     width: 30%;
 }
@@ -455,13 +465,94 @@ input[type=text]:focus, input[type=password]:focus {
     width: 50%;
 }
 
-#col1_practise table {
+#tt_overview {
     border: 3px solid white;
     font-size: 24px;
     border-collapse: collapse;
 }
 
 #col1_practise td {
-    border: 1px solid #309901;
+    border: 2px solid white;
     padding: 5px 10px;
+}
+
+#practise_display {
+    background: url('/static/images/questionbox.png') no-repeat;
+    background-size: cover;
+    width: 328px;
+    height: 225px;
+    font-size: 25px;
+    /* To center the writing in the display box */
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#practise_equals {
+    width: 55px;
+    height: 45px;
+    display: block;
+    margin-left: 135px;
+    margin-right: auto;
+    padding: 8px 0 0 0;
+}
+
+/* This is required to help position the main button that inherits from this */
+#practise_answer_plus_main_button {
+    position: relative;
+    top: 0;
+    left: 0;
+    float: left;
+}
+
+#practise_answer {
+    background: url('/static/images/answerbox_inactive.png') no-repeat;
+    background-size: cover;
+    color: white;
+    width: 288px;
+    height: 171px;
+    font-size: 60px;
+    text-align: center;
+    border-radius: 0;
+}
+
+#practise_answer:focus {
+    outline: none;
+}
+
+#practise_main_button {
+    background: url('/static/images/main_button.png') no-repeat;
+    background-size: cover;
+    font-family: 'Nyala', Verdana, Geneva, sans-serif;
+    font-size: 27px;
+    width: 170px;
+    height: 88px;
+    /* To overlay the main button on top of the answer input */
+    position: absolute;
+    top: 67px;
+    left: 80px;
+}
+
+#practise_main_button:focus {
+    outline: none;
+}
+
+#practise_main_button:hover {
+    background: url('/static/images/main_button_hover.png') no-repeat;
+    background-size: cover;
+}
+
+#practise_right_wrong {
+    position: relative;
+    top: 50px;
+    left: 10px;
+    height: 100px;
+    width: 100px;
+}
+
+.tt_overview_answerbox {
+    width: 40px;
+    text-align: center;
+    background-color: #309901;
 }

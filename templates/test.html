@@ -30,9 +30,18 @@
         var medal_earned = 0;
 
         function create_question() {
-            var corr_answer = factors[question_number] * tt;
+            
+            // Changing font size
+            document.querySelector('#display').style.fontSize = '60px';
+
+            // Displaying question
             document.querySelector('#display').innerHTML = factors[question_number] + ' x ' + tt;
-        
+
+            // Playing sound
+            var questionsound = new Audio('/static/sounds/' + factors[question_number] + 'x' + tt + '.mp3');
+            questionsound.play();
+
+            var corr_answer = factors[question_number] * tt;
             return corr_answer;
         }
 
@@ -47,8 +56,10 @@
             {
                 // Answer is correct
                 if (answer == corr_answer) {
+                    // Displaying checkmark
                     document.querySelector('#right_wrong').src = '/static/images/tick.png';
                     document.querySelector('#right_wrong').style.display = 'block';
+
                     // Checking if a timer has been started and clearing it first before starting a new one
                     if (typeof right_wrong_timer !== 'undefined') { 
                         clearInterval(right_wrong_timer);
@@ -106,7 +117,17 @@
         }
 
         function finish() {
-
+            // Checking if the last question was answered or time ran out (in which case it counts as wrong)
+            if (question_number == 11 && time == 0) {
+                wrong_questions.push(factors[question_number]);
+            }
+            // Checking penultimate question
+            else if (question_number == 10 && time == 0) {
+                wrong_questions.push(factors[question_number]);
+                question_number++;
+                wrong_questions.push(factors[question_number]);
+            }
+            
             // Displaying message
             document.querySelector('#display').style.fontSize = '20px';
             if (num_of_corr_answers > 11 && time > 49) {
@@ -117,6 +138,11 @@
             else if (num_of_corr_answers > 11) {
                 document.querySelector('#display').innerHTML = 'Congratulations.<br>You earned a silver medal!';
                 medal_earned = 2;
+            }
+
+            else if (num_of_corr_answers > 9 && time == 0) {
+                document.querySelector('#display').innerHTML = 'Congratulations.<br>You earned a bronze medal.<br><br>Keep on practising<br>to get faster.';
+                medal_earned = 1;
             }
 
             else if (num_of_corr_answers > 10) {
@@ -145,7 +171,7 @@
             document.querySelector('#answer').disabled = true;
             document.querySelector('#answer').style.backgroundImage = "url('/static/images/answerbox_inactive.png')";
             document.querySelector('#main_button').style.display = 'block';
-            document.querySelector('#main_button').innerHTML = 'Play Again'
+            document.querySelector('#main_button').innerHTML = 'Play Again';
 
             // Stopping timer
             clearInterval(timer);
@@ -231,7 +257,6 @@
                 document.querySelector('#answer').focus();
                 document.querySelector('#answer').style.backgroundImage = "url('/static/images/answerbox.png')";
 
-                document.querySelector('#right_wrong').innerHTML = '';
                 document.querySelector('#display').style.fontSize = 'xx-large';
 
                 // Activating and emptying progress bar
@@ -286,8 +311,8 @@
             <div id="display">Welcome!<br>Use your keypad<br>to type in answers.</div>
             <div><img src="/static/images/equals.png" id="equals"></div>
             <div id="answer_plus_main_button">
-                <input id="answer" type="text" autofocus autocomplete="off">
-                <button id="main_button" type="button">Start Game</button>
+                <input id="answer" inputmode="numeric" pattern="[0-9]*" type="text" autocomplete="off">
+                <button id="main_button" type="button" autofocus>Start Game</button>
             </div>
             <img src="/static/images/tick.png" id="right_wrong">
         </div>

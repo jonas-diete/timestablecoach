@@ -1,9 +1,16 @@
 from flask import Flask, redirect, render_template, request, session
 import csv
+import requests
+import io
+from github import Github
 app = Flask(__name__)
 
 # Key for signing the cookies
 app.secret_key = "SANDY_CANYON_SUNSET"
+
+# Authentication key and directory to get data files from github (to save on)
+github = Github("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")
+repository = github.get_user().get_repo("timestablecoach")
 
 @app.route("/")
 def index():
@@ -14,14 +21,24 @@ def login():
     if request.method == "POST":
         if request.form.get("accepted") == "yes":
             session["cookies"] = "yes"
-        # Reading CSV file and creating a users dictionary with usernames and passwords
-        users = {}
-        with open("data/users.csv", "r", newline="") as usernamefile:
-            userreader = csv.reader(usernamefile, delimiter=" ")
-            for row in userreader:
-                if row:     # This is checking if the row is "true", i.e. not empty
-                    users[row[0]] = row[1]
         
+        # --- Reading text file and creating a users dictionary with usernames and passwords ---
+        users = {}
+        # Getting file from GitHub
+        file = repository.get_contents("users.txt")
+        # Decoding file and iterating through it
+        for row in file.decoded_content.decode().split("\n"):
+            username_to_save = ""
+            if row:     # This is checking if the row is "true", i.e. not empty
+                # Saving every character in a new string until we get to a space (delimiter)
+                for char in row:
+                    if char != " ":
+                        username_to_save += char
+                    else:
+                        break
+                # Saving the new string as username and the rest of the row (minus the newline char) as the password
+                users[username_to_save] = row[len(username_to_save) + 1:]
+
         # Checking if cookies have been accepted
         if "cookies" in session:   
 
@@ -37,7 +54,7 @@ def login():
         else:
             return render_template("login.html", login_message = "You must accept the cookies to continue.", cookies = "")
     
-    else:    
+    else:   
         # Deleting username in case we were redirected here after logout
         if "username" in session:
             session.pop("username", default=None) 
@@ -56,18 +73,26 @@ def register():
         new_pw2 = request.form.get("password2")
         
         # Checking if username exists already
-        users = {}
-        with open("data/users.csv", "r", newline="") as usernamefile:
-            userreader = csv.reader(usernamefile, delimiter=" ")
-            for row in userreader:
+        users = []
+        file = repository.get_contents("users.txt")
+        for row in file.decoded_content.decode().split("\n"):
+            if row:     # This is checking if the row is "true", i.e. not empty
+                username_to_save = ""
                 if row:     # This is checking if the row is "true", i.e. not empty
-                    users[row[0]] = row[1]
-        if request.form.get("agreement") != "agreed":
-            return render_template("register.html", register_message = "Please accept the Terms and Conditions.")
-
-        elif new_username in users:
+                    # Saving every character in a new string until we get to a space (delimiter)
+                    for char in row:
+                        if char != " ":
+                            username_to_save += char
+                        else:
+                            break
+                users.append(username_to_save)
+        if new_username in users:
             return render_template("register.html", register_message = "Username exists already. Try again.")
         
+        # Checking if terms and conditions have been agreed to
+        elif request.form.get("agreement") != "agreed":
+            return render_template("register.html", register_message = "Please accept the Terms and Conditions.")
+
         # Checking if username is alphanumeric
         elif not new_username.isalnum():
             return render_template("register.html", register_message = "Only letters or numbers allowed for username. Try again.")
@@ -89,17 +114,29 @@ def register():
             return render_template("register.html", register_message = "Password must be at least 4 characters long. Try again.")
         
         else:
-            # Saving new username and password in CSV file
-            with open("data/users.csv", "a", newline="") as usernamefile:
-                userwriter = csv.writer(usernamefile, delimiter=" ")
-                userwriter.writerow([new_username, new_pw1])
-                                    
-            # Adding entry in medals CSV file for the new user
+            # Saving new username and password in text file on github
+            # Getting previous file
+            file = repository.get_contents("users.txt") 
+            # Updating content
+            updated_file = file.decoded_content.decode() + new_username + " " + new_pw1 + "\n"
+            # Updating file on github
+            f = repository.update_file(file.path, "Overwriting users.txt", updated_file, file.sha)
+
+            # Adding entry in medals.txt for the new user
             # 0 = no medals, 1 = bronze, 2 = silver, 3 = gold
             # Arranged in order of timestables, starting with 2x
-            with open("data/medals.csv", "a", newline="") as medalsfile:
-                medalswriter = csv.writer(medalsfile, delimiter=" ")
-                medalswriter.writerow([new_username, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) 
+            file = repository.get_contents("medals.txt")
+            updated_file = file.decoded_content.decode() + new_username + "00000000000\n"
+            f = repository.update_file(file.path, "Overwriting medals.txt", updated_file, file.sha)
+
+            # Adding data to learning.txt. Creating a line of correct answers 
+            # for each timestable for the new user. Starting with 2x.
+            file = repository.get_contents("learning.txt")
+            updated_file = file.decoded_content.decode() + new_username + "\n"
+            for i in range(11):
+                updated_file += "000000000000\n"
+
+            f = repository.update_file(file.path, "Overwriting learning.txt", updated_file, file.sha)
 
             # Checking if user has accepted cookies
             if "cookies" in session:
@@ -132,15 +169,13 @@ def select():
                 return redirect("/practise/" + tt_selected)
         
         else:
-            # Getting medal-data and saving it in user_medals
-            with open("data/medals.csv", "r", newline="") as medalsfile:
-                medalsreader = csv.reader(medalsfile, delimiter=" ")
-                for row in medalsreader:
-                    if row[0] == session["username"]:
-                        user_medals_str = ""
-                        for i in range(11):
-                            user_medals_str += (row[i + 1])
-
+            # Getting medal-data from file saved on github and saving it in user_medals
+            user_medals_str = ""
+            file = repository.get_contents("medals.txt")
+            for row in file.decoded_content.decode().split("\n"):
+                # Searching for username and checking there is not a longer username which includes the current one
+                if session["username"] in row and len(row) == len(session["username"]) + 11:
+                    user_medals_str = row[len(session["username"]):]
             # Loading page
             return render_template("select.html", username = session["username"], tts = range(3, 13), medals = user_medals_str)
     
@@ -155,28 +190,35 @@ def test(tt):
         else:  # Data was sent through POST
             # Receiving which medal was won, when timestable test was completed
             medal_earned = request.form.get("medal_earned")
-            
+
             if int(medal_earned) > 0:
-                # Saving all medals from all users from file into all_medals variable
-                all_medals = []
-                with open("data/medals.csv", "r", newline="") as medalsfile:
-                    medalsreader = csv.reader(medalsfile, delimiter=" ")
-                    for row in medalsreader:
-                        all_medals.append(row)
+                # Saving all medals from all users from file into all_medals dictionary
+                all_medals = {}
+                file = repository.get_contents("medals.txt")
+                for row in file.decoded_content.decode().split("\n"):
+                    medals_of_user = []
+                    medals_of_user_str = row[len(row) - 11:]
+                    for i in medals_of_user_str:
+                        medals_of_user.append(i)
+                    all_medals[row[:len(row) - 11]] = medals_of_user
 
                 # Updating all_medals with the medal earned from current user and current timestable
-                for row in all_medals:
+                for user in all_medals:
                     # Checking if new medal is actually better than the old one
-                    if row[0] == session["username"] and row[int(tt) - 1] < medal_earned:
-                        row[int(tt) - 1] = medal_earned
+                    if user == session["username"] and all_medals[user][int(tt) - 2] < medal_earned:
+                        all_medals[user][int(tt) - 2] = medal_earned
 
-                        # Overwriting content of CSV file with updated all_medals
-                        with open("data/medals.csv", "w", newline="") as medalsfile:
-                            medalswriter = csv.writer(medalsfile, delimiter=" ")
-                            for row in all_medals:
-                                medalswriter.writerow(row)
-
-            return redirect("/select") # Doesn't work! Getting back with back button instead.
+                # Overwriting whole content of text file with updated all_medals
+                file = repository.get_contents("medals.txt")
+                updated_file = ""
+                for user in all_medals:
+                    medals_of_user_str = ""
+                    for medal in all_medals[user]:
+                        medals_of_user_str += medal
+                    updated_file += user + medals_of_user_str + "\n"
+                repository.update_file(file.path, "Overwriting medals.txt", updated_file, file.sha)
+            
+            return redirect("/select") 
 
 
 @app.route("/practise/<tt>", methods=["GET", "POST"])
@@ -184,31 +226,50 @@ def practise(tt):
     if not "username" in session:
         return redirect("/login")
     else:
-        return render_template("practise.html", timestable = int(tt), username = session["username"], numbers = range(1,13))
-
-@app.route("/admin", methods=["GET", "POST"])
-def admin():
-    if request.method == "POST":
-        if request.form.get("admin_username") == "bohemian" and request.form.get("admin_pw") == "I0AM&fr3e":
-            
-            # Getting all the data
-            user_data = []
-            with open("data/users.csv", "r", newline="") as usersfile:
-                usersreader = csv.reader(usersfile, delimiter=" ")
-                for row in usersreader:
-                    user_data.append(row)
-
-            medal_data = []
-            with open("data/medals.csv", "r", newline="") as medalsfile:
-                medalsreader = csv.reader(medalsfile, delimiter=" ")
-                for row in medalsreader:
-                    medal_data.append(row)
-
-            return render_template("data.html", user_data = user_data, medal_data = medal_data)
+        # Page is loaded normally
+        if request.method == "GET":
+            # Getting the data about which facts have been learned from the selected timestable
+            learningdata = ""
+            x = 0
+            file = repository.get_contents("learning.txt")
+            for row in file.decoded_content.decode().split("\n"):
+                if row:
+                    # Finding correct timestable row
+                    if x == int(tt):
+                        for item in row:
+                            learningdata += item
+                        break
+                    else:
+                        if x > 0:
+                            x += 1
+                    # Finding correct user
+                    if row == session["username"]:
+                        x = 2
+                        
+            # Sending the learning data to be used in practise.html
+            return render_template("practise.html", timestable = int(tt), username = session["username"], numbers = range(1,13), learningdata = learningdata)
+        
+        # Data has been received through POST
         else:
-            return render_template("admin.html")
-    else:
-        return render_template("admin.html")
+            learningdata_updated = request.form.get("learningdata_updated")
+            
+            updated_file = ""
+            learning_information = []
+            # Getting current learning information from github
+            file = repository.get_contents("learning.txt")
+            for row in file.decoded_content.decode().split("\n"):
+                learning_information.append(row)
+
+            for i in range(len(learning_information)):
+                if learning_information[i] == session["username"]:
+                    learning_information[i + int(tt) - 1] = learningdata_updated
+
+            for item in learning_information:
+                updated_file += item + "\n"
+
+            repository.update_file(file.path, "Overwriting learning.txt", updated_file, file.sha)
+        
+            return redirect("/select") 
 
 if __name__ == "__main__":
     app.run()

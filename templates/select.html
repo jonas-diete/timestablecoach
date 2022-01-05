@@ -5,9 +5,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             let medals_str = document.querySelector('#medals_data').innerHTML;
-            // let medals_arr = [];
             for (i = 0; i < 11; i ++) {
-                // medals_arr.push(medals_str[i]);
                 if (medals_str[i] > 0) {
                     document.getElementById((i + 2) + 'x_bronze').style.opacity = '100%';
                 }
@@ -27,7 +25,7 @@
 
     <div class = "row">
         <div class="intro_text">
-            Welcome, {{username}}. Select a timetable.
+            Welcome, {{username}}. Select a timestable.
         </div>
     </div>
 

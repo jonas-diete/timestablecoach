@@ -1,20 +1,553 @@
 {% extends "layout.html" %}
 
+{% block head %}
+	<script>
+
+		var game_started = false;
+		var question_asked = false;
+		var corr_answer = 0;
+		var question_number = 0;
+		var old_factor = 0;
+		// This is the order the timestable facts will be learned in; from easy to hard:
+		var factors_order = [1, 10, 2, 5, 11, 9, 3, 6, 4, 8, 7, 12];
+		
+		// This variable will contain a list of the factors that actually need to be practised in the next few questions; each item will be a list again with the first item in that list being the factor and the second item how many times it has been answered correctly in this practise round.
+		// [[5,2], [10,0], ...] means tt x 5 has been answered correctly 2 times and tt x 10 has been answered correctly 0 times in this round.
+		var current_factors = [];
+
+		function create_question(factor) {
+          	
+          	// Changing font size
+          	document.getElementById('practise_display').style.fontSize = '50px';
+
+            // Displaying question
+            document.getElementById('practise_display').innerHTML = factor + ' x ' + tt;
+
+            // Highlighting the question in the timestable overview on the left
+            for (i = 1; i < 13; i++) {
+               document.getElementById(i + '_row').style.backgroundColor = 'black'; 
+            }
+            document.getElementById(factor + '_row').style.backgroundColor = '#e600ff';
+
+            // Hiding main button and activating answer box
+            document.getElementById('practise_main_button').style.display = 'none';
+            document.getElementById('practise_answer').disabled = false;
+            document.getElementById('practise_answer').focus();
+            document.getElementById('practise_answer').style.backgroundImage = "url('/static/images/answerbox.png')";
+
+            corr_answer = factor * tt;
+            return corr_answer;
+        }
+
+
+        function check_answer(corr_answer) {
+            var answer = document.querySelector('#practise_answer').value;
+            if (answer.length == String(corr_answer).length)
+            {
+                // Answer is correct
+                if (answer == corr_answer) {
+                    // Displaying checkmark
+                    document.querySelector('#practise_right_wrong').src = '/static/images/tick.png';
+                    document.querySelector('#practise_right_wrong').style.display = 'block';
+
+                    // Checking if a timer has been started and clearing it first before starting a new one
+                    if (typeof right_wrong_timer !== 'undefined') { 
+                        clearInterval(right_wrong_timer);
+                    }
+                    right_wrong_timer = setTimeout(right_wrong_timeout, 2000);
+                    
+                    return "correct";
+                }
+
+                // Answer is wrong
+                else { 
+                    // Displaying wrong-cross
+                    document.querySelector('#practise_right_wrong').src = '/static/images/cross.png';
+                    document.querySelector('#practise_right_wrong').style.display = 'block';
+                    
+                    //Checking and starting new timer for cross display
+                    if (typeof right_wrong_timer !== 'undefined') {
+                        clearInterval(right_wrong_timer);
+                    }
+                    right_wrong_timer = setTimeout(right_wrong_timeout, 2000);
+                   
+                    return "wrong";
+                }        
+            }
+        }
+
+
+        // Gets 3 new times table facts (that need to be learned), plus a couple of old ones (that need refreshing - if available)
+        function create_current_factors() {
+
+        	current_factors = [];
+
+        	// Choosing factors that are currently marked as 0, so haven't been practised yet
+        	number_of_facts = 0;
+        	new_facts = 0;
+        	loop1:
+        		for (i = 0; i < 12; i++) {
+        	loop2:
+	        		for (j = 1; j < 13; j++) {
+	        			if (j == factors_order[i] && learningdata[j - 1] == 0) {
+	        				current_factors.push([j, 0]);
+	        				number_of_facts++;
+	        				new_facts++;
+	        				if (number_of_facts == 3) {
+	        					break loop1;
+	        				}
+	        			}
+	        		}
+        		
+        		}
+
+        	// Choosing factors that are currently marked as 1, so have been practised once before, or alternatively
+        	loop1:
+        		for (i = 0; i < 12; i++) {
+        	loop2:	
+	        		for (j = 1; j < 13; j++) {
+	        			if (j == factors_order[i] && learningdata[j - 1] == 1) {
+	        				current_factors.push([j, 0]);
+	        				number_of_facts++;
+	        				if (number_of_facts == 5) {
+	        					break loop1;
+	        				}
+	        			}
+	        		}
+        		
+        		}
+
+        	// Choosing factors that are marked as 2, so have been practised twice before
+        	if (number_of_facts < 5) {
+	        	loop1:
+	        		for (i = 0; i < 12; i++) {
+	        	loop2:	
+		        		for (j = 1; j < 13; j++) {
+		        			if (j == factors_order[i] && learningdata[j - 1] == 2) {
+	        					current_factors.push([j, 0]);
+	        					number_of_facts++;
+		        				if (number_of_facts == 5) {
+		        					break loop1;
+		        				}
+		        			}
+		        		}
+	        		
+	        		}
+	        }
+
+	        // If there are still 3 new facts available, don't use random ones
+	        if (new_facts < 3) {
+		        // If we haven't got 5 facts yet, choose random facts!
+	        	while (number_of_facts < 5) {
+	        		// Creates a random number from 0-11
+	        		random_fact = Math.floor(Math.random() * 12);
+	        		if (!(random_fact in current_factors)) {
+	        			current_factors.push([random_fact, 0]);
+	        			number_of_facts++;
+	        		}
+        		}
+        	}
+
+        }
+
+
+        function choose_next_question(correct_wrong) {
+
+        	// Set first question of the game
+        	if (correct_wrong == 'start') {
+        		old_factor = current_factors[0][0];
+        		question_asked = true;
+        		corr_answer = create_question(current_factors[0][0]);
+        	}
+
+        	// Question has been wrong so needs to be learned
+        	else if (correct_wrong == 'wrong') {
+        		// Resetting the number of correct answers for that factor back to 0
+        		for (i = 0; i < current_factors.length; i++) {
+        			if (current_factors[i][0] == old_factor) {
+        				current_factors[i][1] = 0;
+        			}
+        		}
+
+        		question_asked = false;
+            	learn_question(old_factor);
+        	}
+        	
+        	// Question has just been practised and now needs to be answered once more
+        	else if (correct_wrong == 'practised') {
+        		question_asked = true;
+        		corr_answer = create_question(old_factor);
+        	}
+
+        	// Question has been answered correctly, so need to choose next question
+        	else {
+        		question_asked = true;
+
+        		// First factor has been answered correctly
+        		if (old_factor == current_factors[0][0]) {
+        			
+        			// Saving fact that has been answered correctly
+        			current_factors[0][1]++;
+
+        			// Deciding which question to ask next based on how many times it has been answered correctly
+        			if (current_factors[1][1] < 3) {
+        				old_factor = current_factors[1][0];
+        				corr_answer = create_question(current_factors[1][0]);
+        			}
+        			else if (current_factors[2][1] < 3) {
+        				old_factor = current_factors[2][0];
+        				corr_answer = create_question(current_factors[2][0]);
+        			}
+
+                    // Only if there are some old facts to be repeated
+        			else if (current_factors.length > 3) {
+        				if (current_factors[3][1] < 3) {
+        					old_factor = current_factors[3][0];
+        					corr_answer = create_question(current_factors[3][0]);
+        				}
+        				else if (current_factors[4][1] < 3) {
+        					old_factor = current_factors[4][0];
+        					corr_answer = create_question(current_factors[4][0]);
+        				}
+        			}
+
+        			else if (current_factors[1][1] < 5) {
+        				old_factor = current_factors[1][0];
+        				corr_answer = create_question(current_factors[1][0]);
+        			}
+        			else if (current_factors[2][1] < 5) {
+        				old_factor = current_factors[2][0];
+        				corr_answer = create_question(current_factors[2][0]);
+        			}
+        			else if (current_factors[0][1] < 5) {
+        				old_factor = current_factors[0][0];
+        				corr_answer = create_question(current_factors[0][0]);
+        			}
+        			else {
+        				finish();
+        			}
+        		}
+
+        		// Second factor has been answered correctly
+        		else if (old_factor == current_factors[1][0]) {
+
+        			current_factors[1][1]++;
+
+        			if (current_factors[0][1] < 3) {
+        				old_factor = current_factors[0][0];
+        				corr_answer = create_question(current_factors[0][0]);
+        			}
+        			else if (current_factors[2][1] < 3) {
+        				old_factor = current_factors[2][0];
+        				corr_answer = create_question(current_factors[2][0]);
+        			}
+
+                    // Only if there are some old facts to be repeated
+        			else if (current_factors.length > 3) {
+        				if (current_factors[3][1] < 3) {
+        					old_factor = current_factors[3][0];
+        					corr_answer = create_question(current_factors[3][0]);
+        				}
+        				else if (current_factors[4][1] < 3) {
+        					old_factor = current_factors[4][0];
+        					corr_answer = create_question(current_factors[4][0]);
+        				}
+        			}
+
+        			else if (current_factors[0][1] < 5) {
+        				old_factor = current_factors[0][0];
+        				corr_answer = create_question(current_factors[0][0]);
+        			}
+        			else if (current_factors[2][1] < 5) {
+        				old_factor = current_factors[2][0];
+        				corr_answer = create_question(current_factors[2][0]);
+        			}
+        			else if (current_factors[1][1] < 5) {
+        				old_factor = current_factors[1][0];
+        				corr_answer = create_question(current_factors[1][0]);
+        			}
+        			else {
+        				finish();
+        			}
+        		}
+
+        		// Third factor has been answered correctly
+        		else if (old_factor == current_factors[2][0]) {
+
+        			current_factors[2][1]++;
+
+        			if (current_factors[0][1] < 3) {
+        				old_factor = current_factors[0][0];
+        				corr_answer = create_question(current_factors[0][0]);
+        			}
+        			else if (current_factors[1][1] < 5) {
+        				old_factor = current_factors[1][0];
+        				corr_answer = create_question(current_factors[1][0]);
+        			}
+
+                    // Only if there are some old facts to be repeated
+        			else if (current_factors.length > 3) {  
+        				if (current_factors[3][1] < 3) {
+        					old_factor = current_factors[3][0];
+        					corr_answer = create_question(current_factors[3][0]);
+        				}
+        				else if (current_factors[4][1] < 3) {
+        					old_factor = current_factors[4][0];
+        					corr_answer = create_question(current_factors[4][0]);
+        				}
+        			}
+
+        			else if (current_factors[0][1] < 5) {
+        				old_factor = current_factors[0][0];
+        				corr_answer = create_question(current_factors[0][0]);
+        			}
+        			else if (current_factors[2][1] < 5) {
+        				old_factor = current_factors[2][0];
+        				corr_answer = create_question(current_factors[2][0]);
+        			}
+        			else {
+        				finish();
+        			}
+        		}
+
+        		// Fourth factor has been answered correctly
+        		else if (old_factor == current_factors[3][0]) {
+
+        			current_factors[3][1]++;
+
+        			if (current_factors[0][1] < 5) {
+        				old_factor = current_factors[0][0];
+        				corr_answer = create_question(current_factors[0][0]);
+        			}
+        			else if (current_factors[1][1] < 5) {
+        				old_factor = current_factors[1][0];
+        				corr_answer = create_question(current_factors[1][0]);
+        			}
+        			else if (current_factors[4][1] < 3) {
+        				old_factor = current_factors[4][0];
+        				corr_answer = create_question(current_factors[4][0]);
+        			}
+        			else if (current_factors[2][1] < 5) {
+        				old_factor = current_factors[2][0];
+        				corr_answer = create_question(current_factors[2][0]);
+        			}
+        			else if (current_factors[3][1] < 3) {
+        				old_factor = current_factors[3][0];
+        				corr_answer = create_question(current_factors[3][0]);
+        			}
+        			else {
+        				finish();
+        			}
+        		}
+
+        		// Fifth factor has been answered correctly
+        		else if (old_factor == current_factors[4][0]) {
+
+        			current_factors[4][1]++;
+
+        			if (current_factors[2][1] < 5) {
+        				old_factor = current_factors[2][0];
+        				corr_answer = create_question(current_factors[2][0]);
+        			}
+        			else if (current_factors[1][1] < 5) {
+        				old_factor = current_factors[1][0];
+        				corr_answer = create_question(current_factors[1][0]);
+        			}
+        			else if (current_factors[0][1] < 5) {
+        				old_factor = current_factors[0][0];
+        				corr_answer = create_question(current_factors[0][0]);
+        			}
+        			else if (current_factors[3][1] < 3) {
+        				old_factor = current_factors[3][0];
+        				corr_answer = create_question(current_factors[3][0]);
+        			}
+        			else if (current_factors[4][1] < 3) {
+        				old_factor = current_factors[4][0];
+        				corr_answer = create_question(current_factors[4][0]);
+        			}
+        			else {
+        				finish();
+        			}
+        		}
+
+        	}
+
+        }
+
+        function finish() {
+
+        	// Displaying message
+            document.querySelector('#practise_display').style.fontSize = '20px';
+            document.querySelector('#practise_display').innerHTML = 'Great work!<br>You could take a break now<br>and practise again later<br>or tomorrow.';
+
+        	// Disabling answer text box, displaying start button
+            document.querySelector('#practise_answer').disabled = true;
+            document.querySelector('#practise_answer').style.backgroundImage = "url('/static/images/answerbox_inactive.png')";
+            document.querySelector('#practise_main_button').style.display = 'block';
+            document.querySelector('#practise_main_button').innerHTML = 'Practise More!';
+
+           	// Showing the answers on the side & turning them green
+			for (i = 0; i < 12; i++) {
+					document.getElementById((i + 1) + '_answer').innerHTML = (i + 1) * tt;
+			}
+            let answerboxes = document.getElementsByClassName('tt_overview_answerbox');
+            for (i = 0; i < answerboxes.length; i++) {
+                answerboxes[i].style.backgroundColor = '#309901';
+            }
+
+            // Clearing pink answer
+            for (i = 1; i < 13; i++) {
+               document.getElementById(i + '_row').style.backgroundColor = 'black'; 
+            }
+
+            // Update learningdata
+            for (i = 0; i < current_factors.length; i++) {
+            	learningdata[current_factors[i][0] - 1]++;
+            }
+
+            learningdata_str = "";
+            for (i = 0; i < learningdata.length; i++) {
+                learningdata_str += learningdata[i];
+            }
+
+            // Sending learningdata to app.py
+            var data = new FormData();
+            data.append('learningdata_updated', learningdata_str);
+            var request = new XMLHttpRequest();
+            request.open('POST', '/practise/' + tt);
+            request.send(data);
+
+            // Resetting variables
+            game_started = false;
+			question_asked = false;
+			corr_answer = 0;
+			question_number = 0;
+			old_factor = 0;
+            
+        }
+
+        function learn_question(factor) {
+
+        	// Changing font size
+          	document.getElementById('practise_display').style.fontSize = '30px';
+        	
+        	// Displaying question to learn
+        	document.getElementById('practise_display').innerHTML = 'Repeat after me:<br>' + factor + ' x ' + tt + ' = ' + (factor * tt);
+
+        	// Playing sound
+        	var learningquestionsound = new Audio('/static/sounds/' + factor + 'x' + tt + '=' +'.mp3');
+            learningquestionsound.play();
+
+            // Hiding answerbox and displaying a button to confirm the correct answer
+            document.querySelector('#practise_answer').disabled = true;
+            document.querySelector('#practise_answer').style.backgroundImage = "url('/static/images/answerbox_inactive.png')";
+            document.querySelector('#practise_main_button').style.display = 'block';
+            document.querySelector('#practise_main_button').innerHTML = 'Got it!';
+        }
+
+        // This function is called 2000ms after the tick or cross are displayed, to hide them again.
+        function right_wrong_timeout() {
+            document.querySelector('#practise_right_wrong').style.display = 'none';
+        }
+
+        // When the page is loaded
+		document.addEventListener('DOMContentLoaded', function() {
+			
+			// Declaring global learningdata and tt variables (passed into html with jinja)
+			// learningdata contains a list of how many times each fact from the selected timestable has been practised. E.g. [1,0,0,3,0,2,2,1,0,0,0,1] means 1xtt has been practised once, 2xtt has not been practised yet, etc.
+			learningdata_string = document.getElementById('learningdata').innerHTML;
+			learningdata = [];
+			for (i = 0; i < 12; i++) {
+				learningdata.push(parseInt(learningdata_string[i]));
+			}
+            tt = parseInt(document.getElementById('practise_tt').innerHTML);
+
+            // Disabling answer text box
+            document.getElementById('practise_answer').disabled = true;
+
+            // Hiding tick and cross (rightwrong)
+            document.getElementById('practise_right_wrong').style.display = "none";
+
+            // When main button is clicked
+			document.getElementById('practise_main_button').addEventListener('click', function () {
+				// Starting the game
+				if (game_started == false) {
+					game_started = true;
+
+					// Hiding the answers on the side & clearing green background
+					for (i = 0; i < 12; i++) {
+						document.getElementById((i + 1) + '_answer').innerHTML = '';
+					}
+                    let answerboxes = document.getElementsByClassName('tt_overview_answerbox');
+                    for (i = 0; i < answerboxes.length; i++) {
+                        answerboxes[i].style.backgroundColor = 'transparent';
+                    }
+
+					// Creating the factors for this round of practising
+            		create_current_factors();
+					
+					// Load first question
+					choose_next_question('start');
+				}
+
+				// If we are already in the game, this means someone has clicked the button to signal they have practised a fact
+				else {
+					choose_next_question('practised');
+				}
+				
+			});
+            
+            // When a key is pressed
+            document.querySelector('#practise_answer').addEventListener('keyup', function() {
+                if (question_asked) {
+                    // checking answer, returning true if it has been checked
+                    current_corr_answer = check_answer(corr_answer);
+                    if (current_corr_answer == "correct" || current_corr_answer == "wrong") {
+                        document.querySelector('#practise_answer').value = '';
+                        if (current_corr_answer == 'correct') {
+                            // After 30 questions, the user probably needs a break
+                        	if (question_number < 30) {
+                            	question_number++;
+                            	question_asked = true;
+                            	choose_next_question('correct');
+                            	document.querySelector('#practise_answer').focus();
+                        	}                        
+                        	else {                            
+                            	finish();
+                        	}
+                        }
+                        
+                        if (current_corr_answer == "wrong") {
+                        	choose_next_question('wrong')
+                        }
+                    }
+                }
+			});
+		});
+		
+	</script>
+{% endblock %}
+
 {% block main %}
-    <form>
+    <form id="back_button_form">
         <button type="submit" id="back_button" formaction="/select" formmethod="GET"></button>
     </form>
+
+    <!-- Reading the data that's passed in from app.py 
+    	Objects hidden via styles.css -->
+    <b id="learningdata">{{ learningdata }}</b>
+    <b id="practise_tt">{{ timestable }}</b>
 
  	<div class="row">
 	    
 	    <div class="col" id="col1_practise">
-		    <table>
+		    <table id="tt_overview">
 		    	{% for number in numbers %}
-		    		<tr>
-		    			<td>
+		    		<tr id="{{number}}_row">
+		    			<td class="tt_overview_questionbox">
 					    	<span id="{{number}}_question">{{number}} x {{timestable}} =</span> 
 				    	</td>
-				    	<td>
+				    	<td class="tt_overview_answerbox">
 				    		<span id="{{number}}_answer">{{number * timestable}}</span>
 				    	</td>
 			    	</tr>
@@ -24,13 +557,13 @@
 	
 
 	    <div class="col" id="col2_practise">
-            <div id="display">PRACTISE SECTION<br>-- Under Construction --</div>
-            <div><img src="/static/images/equals.png" id="equals"></div>
-            <div id="answer_plus_main_button">
-                <input id="answer" type="text" autofocus autocomplete="off">
-                <button id="main_button" type="button">---</button>
+            <div id="practise_display">Let's practise the<br>{{ timestable }} times table!</div>
+            <div><img src="/static/images/equals.png" id="practise_equals"></div>
+            <div id="practise_answer_plus_main_button">
+                <input id="practise_answer" inputmode="numeric" pattern="[0-9]*" type="text" autocomplete="off">
+                <button id="practise_main_button" type="button" autofocus>Start Practising</button>
             </div>
-            <img src="/static/images/tick.png" id="right_wrong">
+            <img src="/static/images/tick.png" id="practise_right_wrong">
         </div>
     
     </div>
