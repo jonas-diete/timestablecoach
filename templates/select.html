@@ -35,10 +35,10 @@
 
     
 
-    <div class="row">
+    <div class="select_row">
         <form action="/select" method="POST">
 
-            <div class="col">
+            <div class="select_col">
                 <input type="radio" name="timestable" id="2x" value="2" checked>
                 <label for="2x"><div class="radio_label">2x</div></label>
                 <br>
@@ -50,7 +50,7 @@
             </div>
 
             {% for i in tts %}
-            <div class="col">
+            <div class="select_col">
                 <input type="radio" name="timestable" id="{{ i }}x" value="{{ i }}">
                 <label for="{{ i }}x"><div class="radio_label">{{ i }}x</div></label>
                 <br>
@@ -63,6 +63,9 @@
             {% endfor %}
 
             <div id="buttons_and_help">
+                <form>
+                    <button id="logout_button" type="submit" formaction="/login" formmethod="GET"></button>
+                </form>
                 <button type="submit" name="test_practise" id="test_button" value="test" class="select_button">Test</button>
                 <button type="submit" name="test_practise" id="practise_button" value="practise" class="select_button">Practise</button>
                 
@@ -85,10 +88,12 @@
         </form>
     </div>
 
-    <div class="row">
+    <!--
+    <div class="select_row">
         <form>
             <button id="logout_button" type="submit" formaction="/login" formmethod="GET"></button>
         </form>
     </div>
+    -->
 
 {% endblock %}

@@ -32,10 +32,10 @@
         function create_question() {
             
             // Changing font size
-            document.querySelector('#display').style.fontSize = '60px';
+            document.querySelector('#text').style.fontSize = '3em';
 
             // Displaying question
-            document.querySelector('#display').innerHTML = factors[question_number] + ' x ' + tt;
+            document.querySelector('#text').innerHTML = factors[question_number] + ' x ' + tt;
 
             // Playing sound
             var questionsound = new Audio('/static/sounds/' + factors[question_number] + 'x' + tt + '.mp3');
@@ -129,34 +129,55 @@
             }
             
             // Displaying message
-            document.querySelector('#display').style.fontSize = '20px';
+            
             if (num_of_corr_answers > 11 && time > 49) {
-                document.querySelector('#display').innerHTML = 'Congratulations.<br>You earned a gold medal!';
+                document.querySelector('#text').style.fontSize = '1.15em';
+                document.querySelector('#text').innerHTML = '<br><br>Congratulations.<br>You earned a gold medal!';                
+                document.querySelector('#medalpic').src = '/static/images/gold.png';
+                document.querySelector('#display').style.display = 'block';
+                document.querySelector('#medalpic').style.display = 'block';
                 medal_earned = 3;
             }
 
             else if (num_of_corr_answers > 11) {
-                document.querySelector('#display').innerHTML = 'Congratulations.<br>You earned a silver medal!';
+                document.querySelector('#text').style.fontSize = '1.15em';
+                document.querySelector('#text').innerHTML = 'Congratulations.<br>You earned a silver medal!';
+                document.querySelector('#medalpic').src = '/static/images/silver.png';
+                document.querySelector('#display').style.display = 'block';
+                document.querySelector('#medalpic').style.display = 'block';
                 medal_earned = 2;
             }
 
             else if (num_of_corr_answers > 9 && time == 0) {
-                document.querySelector('#display').innerHTML = 'Congratulations.<br>You earned a bronze medal.<br><br>Keep on practising<br>to get faster.';
+                document.querySelector('#text').style.fontSize = '1em';
+                document.querySelector('#text').innerHTML = '<br>Congratulations.<br>You earned a bronze medal.<br><br>Keep on practising<br>to get faster.';
+                document.querySelector('#medalpic').src = '/static/images/bronze.png';
+                document.querySelector('#display').style.display = 'block';
+                document.querySelector('#medalpic').style.display = 'block';
                 medal_earned = 1;
             }
 
             else if (num_of_corr_answers > 10) {
-                document.querySelector('#display').innerHTML = 'Congratulations.<br>You earned a bronze medal.<br>Revise this question:<br>' + wrong_questions[1] + ' x ' + tt + ' = ' + wrong_questions[1]*tt; 
+                document.querySelector('#text').style.fontSize = '0.8em';
+                document.querySelector('#text').innerHTML = '<br>Congratulations.<br>You earned a bronze medal.<br>Revise this question:<br>' + wrong_questions[1] + ' x ' + tt + ' = ' + wrong_questions[1]*tt; 
+                document.querySelector('#medalpic').src = '/static/images/bronze.png';
+                document.querySelector('#display').style.display = 'block';
+                document.querySelector('#medalpic').style.display = 'block';
                 medal_earned = 1;
             }
 
             else if (num_of_corr_answers > 9) {
-                document.querySelector('#display').innerHTML = 'Congratulations.<br>You earned a bronze medal.<br>Revise these questions:<br>' + wrong_questions[1] + ' x ' + tt + ' = ' + wrong_questions[1]*tt + '<br>' + wrong_questions[2] + ' x ' + tt + ' = ' + wrong_questions[2]*tt;
+                document.querySelector('#text').style.fontSize = '0.8em';
+                document.querySelector('#text').innerHTML = '<br>Congratulations.<br>You earned a bronze medal.<br>Revise these questions:<br>' + wrong_questions[1] + ' x ' + tt + ' = ' + wrong_questions[1]*tt + '<br>' + wrong_questions[2] + ' x ' + tt + ' = ' + wrong_questions[2]*tt;
+                document.querySelector('#medalpic').src = '/static/images/bronze.png';
+                document.querySelector('#display').style.display = 'block';
+                document.querySelector('#medalpic').style.display = 'block';
                 medal_earned = 1;
             }
 
             else {
-                document.querySelector('#display').innerHTML = 'You got ' + num_of_corr_answers + ' answers correct.<br>Keep on practising.';
+                document.querySelector('#text').style.fontSize = '1em';
+                document.querySelector('#text').innerHTML = 'You got ' + num_of_corr_answers + ' out of 12 answers correct.<br>Keep on practising.';
             }
 
             // Sending the medal result
@@ -192,8 +213,9 @@
                 time--;
                 
                 // Shrinking the timer bar, every tenth of a second
-                document.querySelector('#timerbar').style.height = (355 / 300 * (time)) + 'px';
-                document.querySelector('#timerbar').style.top = (77 + (355 / 300 * (300-time))) + 'px';
+                document.querySelector('#timerbar').style.height = (initial_height / 300 * (time)) + 'px';
+                console.log(initial_height);
+                document.querySelector('#timerbar').style.top = (initial_top + (initial_height / 300 * (300-time))) + 'px';
                 
                 // Updating the timer every second
                 if (time % 10 == 0 && time != 0) {
@@ -205,6 +227,7 @@
                     }
                 }
                 else if (time == 0) {
+                    document.querySelector('#timer').innerHTML = '0:00';
                     finish();
                 }
             }
@@ -219,6 +242,10 @@
             
             // Adding the timestable to the wrong answers array, so we know later which tt the factors refer to.
             wrong_questions.push(tt); 
+
+            // Needed to calculate timer bar, if in different screen sizes
+            initial_height = document.querySelector('#timerbar').offsetHeight;
+            initial_top = document.querySelector('#timerbar').offsetTop; 
             
             // Disabling answer text box
             document.querySelector('#answer').disabled = true;
@@ -256,16 +283,18 @@
                 document.querySelector('#answer').disabled = false;
                 document.querySelector('#answer').focus();
                 document.querySelector('#answer').style.backgroundImage = "url('/static/images/answerbox.png')";
-
-                document.querySelector('#display').style.fontSize = 'xx-large';
+                
+                // Hiding medal picture
+                document.querySelector('#medalpic').style.display = 'none';
+                document.querySelector('#display').style.display = 'flex';
 
                 // Activating and emptying progress bar
                 document.querySelector('#progress0').src="/static/images/counter1_active.png";
                 document.querySelector('#progress11').src="/static/images/counter_last.png";
                 for (var i = 1; i < 11; i++) {
                     document.querySelector('#progress' + i).src="/static/images/counter_mid.png";
-                }
-
+                }               
+                
                 // Starting timer
                 document.querySelector('#timer').innerHTML = '0:30';
                 time = 300;
@@ -308,7 +337,10 @@
         </div>
 
         <div class="col" id="col3">
-            <div id="display">Welcome!<br>Use your keypad<br>to type in answers.</div>
+            <div id="display">
+                <div id="text">Welcome!<br>Use your keypad<br>to type in answers.</div>
+                <img id="medalpic" src="/static/images/gold.png">
+            </div>
             <div><img src="/static/images/equals.png" id="equals"></div>
             <div id="answer_plus_main_button">
                 <input id="answer" inputmode="numeric" pattern="[0-9]*" type="text" autocomplete="off">
@@ -325,6 +357,4 @@
         </div>
 
     </div>
-    <br>
-    <br>
 {% endblock %}

@@ -3,6 +3,7 @@
     <head>
         <link href="/static/styles.css" rel="stylesheet">
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0"/>
         {% block head %}{% endblock %}
         <title>
             Times Table Coach
@@ -11,10 +12,7 @@
 
     <body>
         <header>
-            <div class = "row">
-                <div id="title"><img id="title_img" src="/static/images/title_long.png"></div>
-            </div>
-            <br>
+            <img id="title_img" src="/static/images/title_long.png">
         </header>
 
         <main>
@@ -22,11 +20,7 @@
         </main>
 
         <footer>
-            <br>
-            <br>
-            <div class = "row">
-                <h5>Application designed and created by &copy Jonas Diete.</h5>
-            </div>
+            &copy 2022 All programming, design and sounds by Jonas Diete.
         </footer>
     </body>
 </html>

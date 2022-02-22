@@ -4,15 +4,20 @@
     url("/static/nyala.tff") format("tff");
     }
 
+/* General Rules */
+
 body {
     background: black;
     color: white;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-    font-size: large;
+    font-size: 16px;
 }
 
 footer {
     text-align: center;
+    font-size: 14px;
+    margin: 30px auto 10px auto;
+    font-weight: bold;
     clear: both;
 }
 
@@ -27,13 +32,20 @@ button {
     font-size: 15px;    
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     padding: 10px 25px;
-    border-radius: 3px;
     border: 2px solid black;
 }
 
 button:hover {
     color: black;
     background-color:rgb(150, 223, 223);
+}
+
+form {
+    text-align: center;
+}
+
+.form_left {
+    text-align: left;
 }
 
 input[type=text], input[type=password] {
@@ -52,12 +64,10 @@ input[type=text]:focus, input[type=password]:focus {
 }
 
 #title_img {
-    width: 50%;
+    width: 450px;
     display: block;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 10px auto 20px auto;
 }
-
 
 .row {
     margin: auto;
@@ -85,7 +95,7 @@ input[type=text]:focus, input[type=password]:focus {
 }
 
 
-.select_button:hover {
+.select_button:hover, .select_button:active {
     background: url('/static/images/main_button_hover.png') no-repeat;
     background-size: cover;
 }
@@ -95,10 +105,10 @@ input[type=text]:focus, input[type=password]:focus {
 #register_button {
     background: url('/static/images/main_button_green.png') no-repeat;
     background-size: cover;
-    margin: 15px 15px 15px 75px;
+    margin: 15px auto;
 }
 
-#register_button:hover {
+#register_button:hover, #register_button:active {
     background: url('/static/images/main_button_green_hover.png') no-repeat;
     background-size: cover;
 }
@@ -108,15 +118,29 @@ input[type=text]:focus, input[type=password]:focus {
     background-size: cover;
     width: 114px;
     height: 45px;
+    margin-left: 0;
 }
 
-#back_to_login_button:hover {
+#back_to_login_button:hover, #back_to_login_button:active {
     background: url('/static/images/back_button_hover.png') no-repeat;
     background-size: cover;
 }
 
+#checkbox_and_label {
+    padding: 15px 0;
+}
+
+#agreement {
+    height: 20px;
+    width: 20px;
+    margin: 0;
+}
+
 #agreement_label {
     font-size: 14px;
+    position: relative;
+    bottom: 2px;
+    padding: 0 0 0 10px;
 }
 
 /* ------------- LOGIN SCREEN -------------- */
@@ -151,13 +175,13 @@ input[type=text]:focus, input[type=password]:focus {
     background-color: #309901;
 }
 
-#accept_button:hover {
+#accept_button:hover, #accept_button:active {
     color: #fff;
     background-color: gray;
 }
 
 #login_button, #to_register_button {
-    margin: 15px 15px 15px 75px;
+    margin: 15px auto;
 }
 
 #login_button {
@@ -165,7 +189,7 @@ input[type=text]:focus, input[type=password]:focus {
     background-size: cover;
 }
 
-#login_button:hover {
+#login_button:hover, #login_button:active {
     background: url('/static/images/main_button_green_hover.png') no-repeat;
     background-size: cover;
 }
@@ -177,7 +201,17 @@ input[type=text]:focus, input[type=password]:focus {
     display: none;
 }
 
-/* Hiding radio buttons */
+.select_row {
+    margin: auto;
+    width: 970px;
+}
+
+.select_col {
+    float: left;
+    margin: 0;
+}
+
+/* Hiding radio buttons - displaying just the radio_label that users can select*/
 [type=radio] { 
     position: absolute;
     opacity: 0;
@@ -222,8 +256,8 @@ input[type=text]:focus, input[type=password]:focus {
 }
 
 #buttons_and_help {
-    margin: 0 0 0 250px;
-    width: 70%
+    margin: 0 0 0 0px;
+    width: 90%
 }
 
 #help_imgs {
@@ -263,7 +297,8 @@ input[type=text]:focus, input[type=password]:focus {
     background: url('/static/images/logout_button.png') no-repeat;
     background-size: cover;
     width: 129px;
-    height: 43px;
+    height: 45px;
+    margin: 0 70px 0 0;
 }
 
 #logout_button:hover {
@@ -301,12 +336,23 @@ input[type=text]:focus, input[type=password]:focus {
     background-size: cover;
     width: 328px;
     height: 225px;
-    font-size: 25px;
+    font-size: 20px;
     /* To center the writing in the display box */
     text-align: center;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+}
+
+
+#text {
+    font-size: 1.25em;
+}
+
+#medalpic {
+    height: 70px;
+    display: none;
+    margin: 20px auto 0 auto;
 }
 
 #equals {
@@ -350,7 +396,7 @@ input[type=text]:focus, input[type=password]:focus {
     left: 80px;
 }
 
-#main_button:hover {
+#main_button:hover #main_button:active {
     background: url('/static/images/main_button_hover.png') no-repeat;
     background-size: cover;
 }
@@ -371,8 +417,6 @@ input[type=text]:focus, input[type=password]:focus {
     width: 100px;
 }
 
-
-
 /* Inherits from #col1 */
 #back_button_form {
     position: absolute;
@@ -387,7 +431,7 @@ input[type=text]:focus, input[type=password]:focus {
     height: 50px;
 }
 
-#back_button:hover {
+#back_button:hover, #back_button:active {
     background: url('/static/images/back_button_hover.png') no-repeat;
     background-size: cover;
 }
@@ -457,23 +501,36 @@ input[type=text]:focus, input[type=password]:focus {
     display: none;
 }
 
+#practise_objects {
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 #col1_practise {
-    width: 30%;
+    width: 45%;
 }
 
 #col2_practise {
-    width: 50%;
+    width: 55%;
 }
 
 #tt_overview {
     border: 3px solid white;
     font-size: 24px;
     border-collapse: collapse;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #col1_practise td {
     border: 2px solid white;
     padding: 5px 10px;
+}
+
+#practise-box {
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #practise_display {
@@ -555,4 +612,116 @@ input[type=text]:focus, input[type=password]:focus {
     width: 40px;
     text-align: center;
     background-color: #309901;
+}
+
+
+/* ---------------- Display for a phone --------------------- */
+
+@media only screen and (max-width: 480px) {
+    .narrow_row {
+        width: 90%;
+    }
+
+    .row {
+        width: 95%;
+    }
+
+    #title_img {
+        width: 80%;
+        margin: 2px auto;
+    }    
+
+    .intro_text {
+        font-size: 20px;
+    }
+
+    /* ------------- TEST SCREEN ------------- */
+    #col1 {
+        width: 0;
+        height: 380px;
+        min-height: 300px;
+    }
+
+    #userbackground, #ttbackground {
+        visibility: hidden;
+    }
+
+    #display {
+        width: 200px;
+        height: 137px;
+        font-size: 12px;
+    }
+
+    #answer {
+        width: 152px;
+        height: 90px;
+        font-size: 38px;
+    }
+
+    #main_button {
+        font-size: 15px;
+        width: 95px;
+        height: 50px;
+        /* To overlay the main button on top of the answer input */
+        position: absolute;
+        top: 44px;
+        left: 52px;
+        padding: 0;
+    }
+
+    #medalpic {
+        height: 43px;
+        margin: 10px auto 0 auto;
+    }
+
+    .progress {
+        width: 43px;
+    }
+
+    #right_wrong {
+        position: absolute;
+        top: 380px;
+        left: 160px;
+        height: 60px;
+        width: 60px;
+    }
+
+    #timerframe {
+        background: url('/static/images/timer.png') no-repeat;
+        background-size: cover;
+        height: 300px;
+        width: 46px;
+        position: relative;
+        top: 0;
+        left: 70px;
+    }
+
+    #timerbar {
+        position: absolute;
+        top: 50px;
+        left: 14px;
+        height: 218px;
+        width: 18px;
+        background-color: #e600ff;
+    }
+
+    #timer {
+        position: absolute;
+        top: 283px;
+        left: 9px;
+        font-size: 11px;
+    }
+
+    #equals {
+        width: 35px;
+        height: 29px;
+        margin-left: 85px;
+        margin-right: auto;
+        padding: 5px 0 0 0;
+    }
+
+    #back_button {
+        width: 90px;
+        height: 35px;
+    }
 }
