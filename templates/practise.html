@@ -18,10 +18,10 @@
 		function create_question(factor) {
           	
           	// Changing font size
-          	document.getElementById('practise_display').style.fontSize = '50px';
+          	document.getElementById('text').style.fontSize = '3em';
 
             // Displaying question
-            document.getElementById('practise_display').innerHTML = factor + ' x ' + tt;
+            document.getElementById('text').innerHTML = factor + ' x ' + tt;
 
             // Highlighting the question in the timestable overview on the left
             for (i = 1; i < 13; i++) {
@@ -377,8 +377,8 @@
         function finish() {
 
         	// Displaying message
-            document.querySelector('#practise_display').style.fontSize = '20px';
-            document.querySelector('#practise_display').innerHTML = 'Great work!<br>You could take a break now<br>and practise again later<br>or tomorrow.';
+            document.querySelector('#text').style.fontSize = '1em';
+            document.querySelector('#text').innerHTML = 'Great work!<br>You could take a break now<br>and practise again later<br>or tomorrow.';
 
         	// Disabling answer text box, displaying start button
             document.querySelector('#practise_answer').disabled = true;
@@ -429,10 +429,10 @@
         function learn_question(factor) {
 
         	// Changing font size
-          	document.getElementById('practise_display').style.fontSize = '30px';
+          	document.getElementById('text').style.fontSize = '1.6em';
         	
         	// Displaying question to learn
-        	document.getElementById('practise_display').innerHTML = 'Repeat after me:<br>' + factor + ' x ' + tt + ' = ' + (factor * tt);
+        	document.getElementById('text').innerHTML = 'Repeat after me:<br>' + factor + ' x ' + tt + ' = ' + (factor * tt);
 
         	// Playing sound
         	var learningquestionsound = new Audio('/static/sounds/' + factor + 'x' + tt + '=' +'.mp3');
@@ -529,7 +529,8 @@
 {% endblock %}
 
 {% block main %}
-    <form id="back_button_form">
+    <br>
+    <form id="practise_back_button_form">
         <button type="submit" id="back_button" formaction="/select" formmethod="GET"></button>
     </form>
 
@@ -557,7 +558,7 @@
 	
 
 	    <div class="col" id="col2_practise">
-            <div id="practise_display">Let's practise the<br>{{ timestable }} times table!</div>
+            <div id="practise_display"><div id="text">Let's practise the<br>{{ timestable }} times table!</div></div>
             <div><img src="/static/images/equals.png" id="practise_equals"></div>
             <div id="practise_answer_plus_main_button">
                 <input id="practise_answer" inputmode="numeric" pattern="[0-9]*" type="text" autocomplete="off">

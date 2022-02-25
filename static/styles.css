@@ -6,6 +6,11 @@
 
 /* General Rules */
 
+* {
+    padding: 0;
+    margin: 0;
+}
+
 body {
     background: black;
     color: white;
@@ -56,7 +61,7 @@ input[type=text], input[type=password] {
     font-size: 23px;    
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     padding: 12px 20px;
-    margin: 8px 0;
+    margin: 8px auto;
 }
 
 input[type=text]:focus, input[type=password]:focus {
@@ -82,6 +87,7 @@ input[type=text]:focus, input[type=password]:focus {
 .intro_text {
     text-align: center;
     font-size: 26px;
+    margin: 10px auto 15px auto;
 }
 
 .select_button {
@@ -301,7 +307,7 @@ input[type=text]:focus, input[type=password]:focus {
     margin: 0 70px 0 0;
 }
 
-#logout_button:hover {
+#logout_button:hover, #logout_button:active {
     background: url('/static/images/logout_button_hover.png') no-repeat;
     background-size: cover;
 }
@@ -396,7 +402,7 @@ input[type=text]:focus, input[type=password]:focus {
     left: 80px;
 }
 
-#main_button:hover #main_button:active {
+#main_button:hover, #main_button:active {
     background: url('/static/images/main_button_hover.png') no-repeat;
     background-size: cover;
 }
@@ -501,10 +507,16 @@ input[type=text]:focus, input[type=password]:focus {
     display: none;
 }
 
+#practise_back_button_form {
+    position: absolute;
+    left: 30px;
+}
+
 #practise_objects {
     width: 800px;
     margin-left: auto;
     margin-right: auto;
+    height: 560px;
 }
 
 #col1_practise {
@@ -523,7 +535,7 @@ input[type=text]:focus, input[type=password]:focus {
     margin-right: auto;
 }
 
-#col1_practise td {
+#tt_overview td {
     border: 2px solid white;
     padding: 5px 10px;
 }
@@ -538,7 +550,7 @@ input[type=text]:focus, input[type=password]:focus {
     background-size: cover;
     width: 328px;
     height: 225px;
-    font-size: 25px;
+    font-size: 20px;
     /* To center the writing in the display box */
     text-align: center;
     display: flex;
@@ -595,7 +607,7 @@ input[type=text]:focus, input[type=password]:focus {
     outline: none;
 }
 
-#practise_main_button:hover {
+#practise_main_button:hover, #practise_main_button:active {
     background: url('/static/images/main_button_hover.png') no-repeat;
     background-size: cover;
 }
@@ -612,6 +624,13 @@ input[type=text]:focus, input[type=password]:focus {
     width: 40px;
     text-align: center;
     background-color: #309901;
+}
+
+@media only screen and (max-width: 980px) {
+    #practise_back_button_form {
+        top: 670px;
+        left: 10px
+    }
 }
 
 
@@ -633,40 +652,209 @@ input[type=text]:focus, input[type=password]:focus {
 
     .intro_text {
         font-size: 20px;
+        margin: 20px auto 15px auto;
     }
 
-    /* ------------- TEST SCREEN ------------- */
+    input {
+        width: 80%;
+    }
+
+    /* ------------- SELECT SCREEN on phone ------------ */
+
+    .select_row {
+        width: 95%;
+    }
+
+    .select_col {
+        float: none;
+    }
+
+    .medal_container {
+        display: inline-block;
+    }
+
+    .medal_img {
+        margin: 8px 0 8px 10px;
+        width: 40px;
+        height: 40px;
+    }
+
+    .radio_label {
+        width: 60px;
+        height: 46px;
+        margin: 5px;
+    }
+
+    #main_select_part {
+        height: 605px;
+        margin: 0 0 120px 0;
+        padding: 0;
+    }
+
+    #buttons_and_help {
+        position: fixed;
+        background-color: black;
+        border-top: 2px solid white;
+        height: 120px;
+        width: 100%;
+        bottom: 0;
+        left: 0;
+        text-align: center;
+    }
+
+    #test_button, #practise_button {
+        width: 100px;
+        height: 52px;
+        font-size: 1.5rem;
+        margin: 5px;
+    }
+
+    #test_button {
+        margin-left: 20px;
+    }
+
+    #practise_button {
+        padding: 10px 8px;
+        margin: 5px;
+    }
+
+    #help_imgs {
+        position: absolute;
+        top: 50px;
+        left: 120px;
+        margin: 10px;
+    }
+
+    #help_imgs img {
+        margin: 5px;
+        height: 40px;
+        width: 40px;
+    }
+
+    .tooltip {
+        position: relative;
+    }
+
+    .tooltip_text {
+        visibility: hidden;
+        width: 150px;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 5px;
+
+        position: absolute;
+        z-index: 1;
+        bottom: 100%;
+        right: 105%;
+    }
+
+    .tooltip:hover .tooltip_text {
+        visibility: hidden;
+    }
+
+    #gold_text {
+        right: 0;
+        left: 105%;
+    }
+
+    #logout_button {
+        position: absolute;
+        top: 70px;
+        left: 10px;
+        width: 100px;
+        height: 35px;
+        margin: 0 0 0 0;
+    }
+
+
+    /* ------------- TEST SCREEN and PRACTISE SCREEN on phone ------------- */
+
+
     #col1 {
         width: 0;
         height: 380px;
         min-height: 300px;
     }
 
+    #col2 {
+        width: 20%;
+    }
+
+    #col3 {
+        width: 60%;
+    }
+
+    #col4 {
+        width: 20%;
+    }
+
+    #col1_practise {
+        width: 38%;
+    }
+
+    #col2_practise {
+        width: 62%;
+    }
+
+    #practise_objects {
+        width: 100%;
+        height: 380px;
+    }
+
+    #tt_overview {
+        border: 2px solid white;
+        font-size: 14px;
+    }
+
+    #tt_overview td {
+        border: 2px solid white;
+        padding: 3px 7px;
+    }
+
+    .tt_overview_answerbox {
+        width: 20px;
+    }
+
     #userbackground, #ttbackground {
         visibility: hidden;
     }
 
-    #display {
+    #display, #practise_display {
         width: 200px;
         height: 137px;
         font-size: 12px;
+        margin: 0 auto;
     }
 
-    #answer {
+    #answer_plus_main_button, #practise_answer_plus_main_button {
+        left: auto;
+        margin: 0 auto;
+        float: none;
+        text-align: center;
+    }
+
+    #answer, #practise_answer {
         width: 152px;
         height: 90px;
         font-size: 38px;
     }
 
-    #main_button {
+    #main_button, #practise_main_button {
         font-size: 15px;
         width: 95px;
         height: 50px;
         /* To overlay the main button on top of the answer input */
         position: absolute;
         top: 44px;
-        left: 52px;
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
         padding: 0;
+    }
+
+    #practise_main_button {
+        font-size: 14px;
     }
 
     #medalpic {
@@ -678,12 +866,16 @@ input[type=text]:focus, input[type=password]:focus {
         width: 43px;
     }
 
-    #right_wrong {
+    #right_wrong, #practise_right_wrong {
         position: absolute;
         top: 380px;
         left: 160px;
         height: 60px;
         width: 60px;
+    }
+
+    #practise_right_wrong {
+        left: 225px;
     }
 
     #timerframe {
@@ -692,8 +884,7 @@ input[type=text]:focus, input[type=password]:focus {
         height: 300px;
         width: 46px;
         position: relative;
-        top: 0;
-        left: 70px;
+        margin: 0 0 0 auto;
     }
 
     #timerbar {
@@ -712,10 +903,10 @@ input[type=text]:focus, input[type=password]:focus {
         font-size: 11px;
     }
 
-    #equals {
+    #equals, #practise_equals {
         width: 35px;
         height: 29px;
-        margin-left: 85px;
+        margin-left: auto;
         margin-right: auto;
         padding: 5px 0 0 0;
     }
@@ -724,4 +915,10 @@ input[type=text]:focus, input[type=password]:focus {
         width: 90px;
         height: 35px;
     }
+
+    #practise_back_button_form {
+        top: 400px;
+        left: 10px
+    }
 }
+

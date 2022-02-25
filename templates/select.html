@@ -4,6 +4,19 @@
     <script>
 
         document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('click', function(e) {
+                let help_buttons = ['gold', 'silver', 'bronze'];
+                for (let i = 0; i < 3; i++) {
+                    let text = document.getElementById(help_buttons[i] + '_text');
+                    if (e.target.id == help_buttons[i] + '_help' && text.style.visibility == 'hidden') {
+                        text.style.visibility = 'visible';
+                    }
+                    else {
+                        text.style.visibility = 'hidden';
+                    }       
+                }
+            });
+
             let medals_str = document.querySelector('#medals_data').innerHTML;
             for (i = 0; i < 11; i ++) {
                 if (medals_str[i] > 0) {
@@ -29,38 +42,46 @@
         </div>
     </div>
 
-    <br><br>
     <!-- This is just to get the medals data that was passed into jinja and call it with javascript -->
     <b id="medals_data">{{ medals }}</b> 
 
-    
-
     <div class="select_row">
         <form action="/select" method="POST">
+            <div id="main_select_part">
+                <div class="select_col">
+                    <div class="medal_container">
+                        <input type="radio" name="timestable" id="2x" value="2" checked>
+                        <label for="2x"><div class="radio_label">2x</div></label>
+                    </div>
+                    <div class="medal_container">
+                        <img src="/static/images/bronze.png" class="medal_img" id="2x_bronze">
+                    </div>
+                    <div class="medal_container">
+                        <img src="/static/images/silver.png" class="medal_img" id="2x_silver">
+                    </div>
+                    <div class="medal_container">
+                        <img src="/static/images/gold.png" class="medal_img" id="2x_gold">
+                    </div>
+                </div>
 
-            <div class="select_col">
-                <input type="radio" name="timestable" id="2x" value="2" checked>
-                <label for="2x"><div class="radio_label">2x</div></label>
-                <br>
-                <img src="/static/images/bronze.png" class="medal_img" id="2x_bronze">
-                <br>
-                <img src="/static/images/silver.png" class="medal_img" id="2x_silver">
-                <br>
-                <img src="/static/images/gold.png" class="medal_img" id="2x_gold">
+                {% for i in tts %}
+                <div class="select_col">
+                    <div class="medal_container">
+                        <input type="radio" name="timestable" id="{{ i }}x" value="{{ i }}">
+                        <label for="{{ i }}x"><div class="radio_label">{{ i }}x</div></label>
+                    </div>
+                    <div class="medal_container">
+                        <img src="/static/images/bronze.png" class="medal_img" id="{{ i }}x_bronze">
+                    </div>
+                    <div class="medal_container">
+                        <img src="/static/images/silver.png" class="medal_img" id="{{ i }}x_silver">
+                    </div>
+                    <div class="medal_container">
+                        <img src="/static/images/gold.png" class="medal_img" id="{{ i }}x_gold">
+                    </div>
+                </div>
+                {% endfor %}
             </div>
-
-            {% for i in tts %}
-            <div class="select_col">
-                <input type="radio" name="timestable" id="{{ i }}x" value="{{ i }}">
-                <label for="{{ i }}x"><div class="radio_label">{{ i }}x</div></label>
-                <br>
-                <img src="/static/images/bronze.png" class="medal_img" id="{{ i }}x_bronze">
-                <br>
-                <img src="/static/images/silver.png" class="medal_img" id="{{ i }}x_silver">
-                <br>
-                <img src="/static/images/gold.png" class="medal_img" id="{{ i }}x_gold">
-            </div>
-            {% endfor %}
 
             <div id="buttons_and_help">
                 <form>
@@ -71,15 +92,15 @@
                 
                 <span id="help_imgs">
                     <span class="tooltip"><img src="/static/images/gold_help.png" id="gold_help">
-                        <span class="tooltip_text">To earn a gold medal, answer all questions correctly within 25 seconds.</span>
+                        <span class="tooltip_text" id="gold_text">To earn a gold medal, answer all questions correctly within 25 seconds.</span>
                     </span>
                     
                     <span class="tooltip"><img src="/static/images/silver_help.png" id="silver_help">
-                        <span class="tooltip_text">To earn a silver medal, answer all questions correctly within 30 seconds.</span>
+                        <span class="tooltip_text" id="silver_text">To earn a silver medal, answer all questions correctly within 30 seconds.</span>
                     </span>
 
                     <span class="tooltip"><img src="/static/images/bronze_help.png" id="bronze_help">
-                        <span class="tooltip_text">To earn a bronze medal, answer at least 10 questions correctly within 30 seconds.</span>
+                        <span class="tooltip_text" id="bronze_text">To earn a bronze medal, answer at least 10 questions correctly within 30 seconds.</span>
                     </span>
                 </span>
             </div>
@@ -87,13 +108,5 @@
 
         </form>
     </div>
-
-    <!--
-    <div class="select_row">
-        <form>
-            <button id="logout_button" type="submit" formaction="/login" formmethod="GET"></button>
-        </form>
-    </div>
-    -->
 
 {% endblock %}
