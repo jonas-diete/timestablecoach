@@ -353,6 +353,7 @@ input[type=text]:focus, input[type=password]:focus {
 
 #text {
     font-size: 1.25em;
+    padding: 0 10px;
 }
 
 #medalpic {
@@ -892,14 +893,14 @@ input[type=text]:focus, input[type=password]:focus {
         top: 50px;
         left: 14px;
         height: 218px;
-        width: 18px;
+        width: 19px;
         background-color: #e600ff;
     }
 
     #timer {
         position: absolute;
         top: 283px;
-        left: 9px;
+        left: 11px;
         font-size: 11px;
     }
 
