@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.secret_key = "SANDY_CANYON_SUNSET"
 
 # Authentication key and directory to get data files from github (to save on)
-github = Github("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")
+github = Github("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")
 repository = github.get_user().get_repo("timestablecoach")
 
 @app.route("/")
