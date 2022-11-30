@@ -2,16 +2,17 @@ from flask import Flask, redirect, render_template, request, session
 import csv
 import requests
 import io
+import os
 from github import Github
 app = Flask(__name__)
 
 # Key for signing the cookies
-app.secret_key = "SANDY_CANYON_SUNSET"
+app.secret_key = "xxxxx"
 
 # Authentication key and directory to get data files from github (to save on)
 # This is using a private git repository
-github = Github("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")
-repository = github.get_user().get_repo("timestablecoach")
+github = Github(xxxxx)
+repository = github.get_user().get_repo("timestable-coach-data")
 
 @app.route("/")
 def index():
