@@ -3,11 +3,11 @@ from github import Github
 app = Flask(__name__)
 
 # Key for signing the cookies
-app.secret_key = "key"
+app.secret_key = "SANDY_CANYON_SUNSET"
 
 # Authentication key and directory to get data files from github (to save on)
 # This is using a private git repository
-github = Github("auth_token")
+github = Github("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")
 repository = github.get_user().get_repo("timestable-coach-data")
 
 @app.route("/")
