@@ -2,7 +2,6 @@ from flask import Flask, redirect, render_template, request, session
 import csv
 import requests
 import io
-import os
 from github import Github
 app = Flask(__name__)
 
@@ -11,7 +10,7 @@ app.secret_key = "xxxxx"
 
 # Authentication key and directory to get data files from github (to save on)
 # This is using a private git repository
-github = Github(xxxxx)
+github = Github("xxxxx")
 repository = github.get_user().get_repo("timestable-coach-data")
 
 @app.route("/")
