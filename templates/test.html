@@ -9,7 +9,7 @@
             while (currentIndex != 0) {
                 randomIndex = Math.floor(Math.random() * currentIndex);
                 currentIndex--;
-            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
             }
             return array;
         }
@@ -116,6 +116,15 @@
 
         }
 
+        function displayFinalMessage(fontSize, message, imagePath, medal) {
+          document.querySelector('#text').style.fontSize = fontSize;
+          document.querySelector('#text').innerHTML = message;                
+          document.querySelector('#medalpic').src = imagePath;
+          document.querySelector('#display').style.display = 'block';
+          document.querySelector('#medalpic').style.display = 'block';
+          medal_earned = medal;
+        }
+
         function finish() {
             // Checking if the last question was answered or time ran out (in which case it counts as wrong)
             if (question_number == 11 && time == 0) {
@@ -128,53 +137,29 @@
                 wrong_questions.push(factors[question_number]);
             }
             
-            // Displaying message
+            // Displaying final messages
             
+            // gold
             if (num_of_corr_answers > 11 && time > 49) {
-                document.querySelector('#text').style.fontSize = '1.15em';
-                document.querySelector('#text').innerHTML = '<br><br>Congratulations.<br>You earned a gold medal!';                
-                document.querySelector('#medalpic').src = '/static/images/gold.png';
-                document.querySelector('#display').style.display = 'block';
-                document.querySelector('#medalpic').style.display = 'block';
-                medal_earned = 3;
+              displayFinalMessage('1.15em', '<br><br>Congratulations.<br>You earned a gold medal!', '/static/images/gold.png', 3);
             }
-
+            // silver
             else if (num_of_corr_answers > 11) {
-                document.querySelector('#text').style.fontSize = '1.15em';
-                document.querySelector('#text').innerHTML = 'Congratulations.<br>You earned a silver medal!';
-                document.querySelector('#medalpic').src = '/static/images/silver.png';
-                document.querySelector('#display').style.display = 'block';
-                document.querySelector('#medalpic').style.display = 'block';
-                medal_earned = 2;
+              displayFinalMessage('1.15em', '<br>Congratulations.<br>You earned a silver medal!', '/static/images/silver.png', 2);
             }
-
+            // bronze - too slow
             else if (num_of_corr_answers > 9 && time == 0) {
-                document.querySelector('#text').style.fontSize = '1em';
-                document.querySelector('#text').innerHTML = '<br>Congratulations.<br>You earned a bronze medal.<br>Keep on practising<br>to get faster.';
-                document.querySelector('#medalpic').src = '/static/images/bronze.png';
-                document.querySelector('#display').style.display = 'block';
-                document.querySelector('#medalpic').style.display = 'block';
-                medal_earned = 1;
+              displayFinalMessage('1em', '<br>Congratulations.<br>You earned a bronze medal.<br>Keep on practising<br>to get faster.', '/static/images/bronze.png', 1);
             }
-
+            // bronze - 1 question wrong
             else if (num_of_corr_answers > 10) {
-                document.querySelector('#text').style.fontSize = '0.8em';
-                document.querySelector('#text').innerHTML = '<br>Congratulations.<br>You earned a bronze medal.<br>Revise this question:<br>' + wrong_questions[1] + ' x ' + tt + ' = ' + wrong_questions[1]*tt; 
-                document.querySelector('#medalpic').src = '/static/images/bronze.png';
-                document.querySelector('#display').style.display = 'block';
-                document.querySelector('#medalpic').style.display = 'block';
-                medal_earned = 1;
+              displayFinalMessage('0.8em', '<br>Congratulations.<br>You earned a bronze medal.<br>Revise this question:<br>' + wrong_questions[1] + ' x ' + tt + ' = ' + wrong_questions[1]*tt, '/static/images/bronze.png', 1);
             }
-
+            // bronze - 2 questions wrong
             else if (num_of_corr_answers > 9) {
-                document.querySelector('#text').style.fontSize = '0.8em';
-                document.querySelector('#text').innerHTML = '<br>Congratulations.<br>You earned a bronze medal.<br>Revise these questions:<br>' + wrong_questions[1] + ' x ' + tt + ' = ' + wrong_questions[1]*tt + '<br>' + wrong_questions[2] + ' x ' + tt + ' = ' + wrong_questions[2]*tt;
-                document.querySelector('#medalpic').src = '/static/images/bronze.png';
-                document.querySelector('#display').style.display = 'block';
-                document.querySelector('#medalpic').style.display = 'block';
-                medal_earned = 1;
+              displayFinalMessage('0.8em', '<br>Congratulations.<br>You earned a bronze medal.<br>Revise these questions:<br>' + wrong_questions[1] + ' x ' + tt + ' = ' + wrong_questions[1]*tt + '<br>' + wrong_questions[2] + ' x ' + tt + ' = ' + wrong_questions[2]*tt, '/static/images/bronze.png', 1);
             }
-
+            // no medal
             else {
                 document.querySelector('#text').style.fontSize = '1em';
                 document.querySelector('#text').innerHTML = 'You got ' + num_of_corr_answers + ' out of 12 answers correct.<br>Keep on practising.';
@@ -216,19 +201,19 @@
                 document.querySelector('#timerbar').style.height = (initial_height / 300 * (time)) + 'px';
                 console.log(initial_height);
                 document.querySelector('#timerbar').style.top = (initial_top + (initial_height / 300 * (300-time))) + 'px';
-                
+                let timeDisplayed = document.querySelector('#timer');
                 // Updating the timer every second
                 if (time % 10 == 0 && time != 0) {
                     if (time > 90) {
-                        document.querySelector('#timer').innerHTML = '0:' + (time / 10);
+                      timeDisplayed.innerHTML = '0:' + (time / 10);
                     }
                     else if (time > 0) {
-                        document.querySelector('#timer').innerHTML = '0:0' + (time / 10);
+                      timeDisplayed.innerHTML = '0:0' + (time / 10);
                     }
                 }
                 else if (time == 0) {
-                    document.querySelector('#timer').innerHTML = '0:00';
-                    finish();
+                  timeDisplayed.innerHTML = '0:00';
+                  finish();
                 }
             }
             
@@ -280,9 +265,10 @@
 
                 //Hiding main button, enabling & focusing answer box
                 document.querySelector('#main_button').style.display = 'none';
-                document.querySelector('#answer').disabled = false;
-                document.querySelector('#answer').focus();
-                document.querySelector('#answer').style.backgroundImage = "url('/static/images/answerbox.png')";
+                let answerBox = document.querySelector('#answer')
+                answerBox.disabled = false;
+                answerBox.focus();
+                answerBox.style.backgroundImage = "url('/static/images/answerbox.png')";
                 
                 // Hiding medal picture
                 document.querySelector('#medalpic').style.display = 'none';
