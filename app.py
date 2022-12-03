@@ -4,12 +4,13 @@ import bcrypt
 app = Flask(__name__)
 
 # Key for signing the cookies
-app.secret_key = "key"
+app.secret_key = "SANDY_CANYON_SUNSET"
 
 # Authentication key and directory to get data files from github (to save on)
 # This is using a private git repository
-github = Github("auth token")
+github = Github('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')
 repository = github.get_user().get_repo("timestable-coach-data")
+
 
 @app.route("/")
 def index():
@@ -117,12 +118,12 @@ def register():
             # Getting previous file
             file = repository.get_contents("users.txt") 
 
-            salt = bcrypt.gensalt()
-            bytes = new_pw1.encode('utf-8')
-            hashed_password = bcrypt.hashpw(bytes, salt)
+            # salt = bcrypt.gensalt()
+            # bytes = new_pw1.encode('utf-8')
+            # hashed_password = bcrypt.hashpw(bytes, salt)
 
             # Updating content
-            updated_file = file.decoded_content.decode() + new_username + " " + hashed_password + "\n"
+            updated_file = file.decoded_content.decode() + new_username + " " + new_pw1 + "\n"
             # Updating file on github
             f = repository.update_file(file.path, "Overwriting users.txt", updated_file, file.sha)
 
