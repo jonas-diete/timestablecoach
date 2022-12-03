@@ -1,6 +1,6 @@
 from flask import Flask, redirect, render_template, request, session
 from github import Github
-import bcrypt
+# import bcrypt
 app = Flask(__name__)
 
 # Key for signing the cookies
