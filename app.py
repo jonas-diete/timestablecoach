@@ -1,7 +1,7 @@
 from flask import Flask, redirect, render_template, request, session
 from github import Github
 from decouple import config
-# import bcrypt
+import bcrypt
 app = Flask(__name__)
 
 # Key for signing the cookies
@@ -121,12 +121,12 @@ def register():
             # Getting previous file
             file = repository.get_contents("users.txt") 
 
-            # salt = bcrypt.gensalt()
-            # bytes = new_pw1.encode('utf-8')
-            # hashed_password = bcrypt.hashpw(bytes, salt)
+            salt = bcrypt.gensalt()
+            encoded_pw = new_pw1.encode('utf-8')
+            hashed_password = bcrypt.hashpw(encoded_pw, salt)
 
             # Updating content
-            updated_file = file.decoded_content.decode() + new_username + " " + new_pw1 + "\n"
+            updated_file = file.decoded_content.decode() + new_username + " " + hashed_password.decode(encoding='UTF-8') + "\n"
             # Updating file on github
             f = repository.update_file(file.path, "Overwriting users.txt", updated_file, file.sha)
 
