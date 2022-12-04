@@ -7,9 +7,10 @@ app = Flask(__name__)
 # Key for signing the cookies
 app.secret_key = "SANDY_CANYON_SUNSET"
 
-# Authentication key and directory to get data files from github (to save on)
-# This is using a private git repository
+# getting auth token from .env file
 GITHUB_TOKEN = config('GITHUB_TOKEN')
+
+# access github repo to save data on
 github = Github(GITHUB_TOKEN)
 repository = github.get_user().get_repo("timestable-coach-data")
 
