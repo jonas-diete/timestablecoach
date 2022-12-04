@@ -1,5 +1,6 @@
 from flask import Flask, redirect, render_template, request, session
 from github import Github
+from decouple import config
 # import bcrypt
 app = Flask(__name__)
 
@@ -8,7 +9,8 @@ app.secret_key = "SANDY_CANYON_SUNSET"
 
 # Authentication key and directory to get data files from github (to save on)
 # This is using a private git repository
-github = Github('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')
+GITHUB_TOKEN = config('GITHUB_TOKEN')
+github = Github(GITHUB_TOKEN)
 repository = github.get_user().get_repo("timestable-coach-data")
 
 
