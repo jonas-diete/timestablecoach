@@ -4,10 +4,10 @@ from decouple import config
 import bcrypt
 app = Flask(__name__)
 
-# Key for signing the cookies
-app.secret_key = "SANDY_CANYON_SUNSET"
+# getting key for signing the cookies from .env file
+app.secret_key = config('COOKIES_KEY')
 
-# getting auth token from .env file
+# getting github auth token from .env file
 GITHUB_TOKEN = config('GITHUB_TOKEN')
 
 # access github repo to save data on
@@ -44,14 +44,21 @@ def login():
 
         # Checking if cookies have been accepted
         if "cookies" in session:   
-
-            # checking if username is in users and if the password is matching 
             username_entered = request.form.get("username")
-            if username_entered in users and request.form.get("password") == users[username_entered]:
-                
-                # Saving username in session cookie
-                session["username"] = username_entered
-                return redirect("/select")
+            password_entered = request.form.get("password")
+
+            # username exists
+            if username_entered in users:
+                stored_password = users[username_entered]
+                # password correct
+                if bcrypt.checkpw(password_entered.encode('utf-8'), stored_password.encode('utf-8')):
+                    # Logging in
+                    session["username"] = username_entered
+                    return redirect("/select")
+                # password wrong
+                else:
+                    return render_template("login.html", login_message = "Incorrect username or password. Try again.", cookies = "yes")
+            # username doesn't exist
             else:
                 return render_template("login.html", login_message = "Incorrect username or password. Try again.", cookies = "yes")
         else:
