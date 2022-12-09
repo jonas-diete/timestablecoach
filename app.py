@@ -1,6 +1,7 @@
 from flask import Flask, redirect, render_template, request, session
 from github import Github
 from decouple import config
+from database_connection import DatabaseConnection
 import bcrypt
 app = Flask(__name__)
 
@@ -64,7 +65,14 @@ def login():
         else:
             return render_template("login.html", login_message = "You must accept the cookies to continue.", cookies = "")
     
+    # GET
     else:   
+
+        # DATABASE TEST
+        database_connection = DatabaseConnection()
+        database_connection.connect('db.bit.io', 'jonas-diete/ttcoach', 'jonas-diete', 'v2_3wdqe_aQbB68hFmX7PFb9Jva6MRgc')
+        
+
         # Deleting username in case we were redirected here after logout
         if "username" in session:
             session.pop("username", default=None) 
