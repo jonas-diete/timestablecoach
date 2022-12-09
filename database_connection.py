@@ -7,3 +7,7 @@ class DatabaseConnection:
     database=db_name,
     user=db_user,
     password=db_password)
+
+    cursor = connection.cursor
+    print('PostgreSQL database version:')
+    cursor.execute('SELECT version()')
