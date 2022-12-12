@@ -78,6 +78,7 @@ def login():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
+
         new_username = request.form.get("username")
         new_pw1 = request.form.get("password1")
         new_pw2 = request.form.get("password2")
@@ -96,7 +97,10 @@ def register():
                         else:
                             break
                 users.append(username_to_save)
-        if new_username in users:
+        if not "cookies" in session:
+            return render_template("register.html", register_message = "Please accept the cookies.")
+
+        elif new_username in users:
             return render_template("register.html", register_message = "Username exists already. Try again.")
         
         # Checking if terms and conditions have been agreed to
@@ -153,14 +157,16 @@ def register():
 
             f = repository.update_file(file.path, "Overwriting learning.txt", updated_file, file.sha)
 
-            # Checking if user has accepted cookies
-            if "cookies" in session:
-                return render_template("login.html", login_message = "New user created. Please Login.", cookies = "yes")
-            else:
-                return render_template("login.html", login_message = "New user created. Please Login.", cookies = "")             
-        
+            # Logging in
+            session["username"] = new_username
+            return redirect("/select")
+      
     else:
-        return render_template("register.html", register_message = "Register a new user.")
+        # Checking if user has accepted cookies
+        if "cookies" in session:
+            return render_template("register.html", register_message = "Register a new user.", cookies = "yes")
+        else:
+            return render_template("register.html", register_message = "Register a new user.", cookies = "")
 
 @app.route("/terms", methods=["GET"])
 def terms():
