@@ -2,6 +2,7 @@ from flask import Flask, redirect, render_template, request, session
 from github import Github
 from decouple import config
 from database_connection import DatabaseConnection
+import psycopg2
 import bcrypt
 app = Flask(__name__)
 
@@ -69,9 +70,36 @@ def login():
     else:   
 
         # DATABASE TEST
-        database_connection = DatabaseConnection()
-        database_connection.connect('db.bit.io', 'jonas-diete/ttcoach', 'jonas-diete', 'v2_3wdqe_aQbB68hFmX7PFb9Jva6MRgc')
-        
+        # database_connection = DatabaseConnection()
+        # database_connection.connect('db.bit.io', 'jonas-diete/ttcoach', 'jonas-diete', 'v2_3wdqe_aQbB68hFmX7PFb9Jva6MRgc')
+        connection = psycopg2.connect(
+          host='db.bit.io',
+          database='jonas-diete/ttcoach',
+          user='jonas-diete',
+          password='v2_3wdqe_aQbB68hFmX7PFb9Jva6MRgc')
+
+        cursor = connection.cursor()
+        print('PostgreSQL database version:')
+        cursor.execute('SELECT version()')
+        db_version = cursor.fetchone()
+        print(db_version)
+
+        cursor.execute('''
+          CREATE TABLE IF NOT EXISTS users (
+            user_id SERIAL PRIMARY KEY,
+            username VARCHAR ( 50 ) NOT NULL UNIQUE,
+            password VARCHAR ( 50 ) NOT NULL
+            );
+            ''')
+
+        cursor.execute('''
+          INSERT INTO users (username, password)
+          VALUES ('George', 'iwillbeking');
+            ''')
+
+        cursor.close()
+
+        connection.commit()
 
         # Deleting username in case we were redirected here after logout
         if "username" in session:
