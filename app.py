@@ -4,6 +4,7 @@ from decouple import config
 from database.database_connection import DatabaseConnection
 from lib.user_repository import UserRepository
 from lib.user import User
+from lib.timestable import Timestable
 import bcrypt
 app = Flask(__name__)
 
@@ -146,14 +147,23 @@ def register():
             encoded_pw = new_pw1.encode('utf-8')
             hashed_password = bcrypt.hashpw(encoded_pw, salt)
 
-            # Saving new user in database
+            # connecting with database
             database_connection = DatabaseConnection()
             connection = database_connection.connect()
+            
+            # creating a user object
+            timestables = {}
+            timestables_names = ['twos', 'threes', 'fours', 'fives', 'sixes', 'sevens', 'eights', 'nines', 'tens', 'elevens', 'twelves']
+            for name in timestables_names:
+              timestables[name] = Timestable(name)
+            user = User(new_username, hashed_password.decode(encoding='UTF-8'), timestables)
+
+            # saving new user in database and
+            # getting the newly assigned user id and saving it in user
             user_repository = UserRepository()
-            user = User(0, new_username, hashed_password.decode(encoding='UTF-8'))
-            print(f'id: {user.id}, username: {user.username}, password: {user.password}')
             user.id = user_repository.create(connection, user)
-            print(f'id: {user.id}, username: {user.username}, password: {user.password}')
+
+            # closing database connetion
             connection.close()
 
             # # Updating content

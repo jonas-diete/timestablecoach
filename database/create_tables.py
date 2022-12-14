@@ -12,18 +12,11 @@ class TableCreator:
           CREATE TABLE IF NOT EXISTS timestables (
             id SERIAL PRIMARY KEY,
             name VARCHAR ( 50 ) NOT NULL,
-            user_id INT NOT NULL,
-            CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(id)
-            );
-            ''')
-        cursor.execute('''
-          CREATE TABLE IF NOT EXISTS medals (
-            id SERIAL PRIMARY KEY,
             bronze BOOLEAN,
             silver BOOLEAN,
             gold BOOLEAN,
-            timestable_id INT NOT NULL,
-            CONSTRAINT fk_timestable FOREIGN KEY(timestable_id) REFERENCES timestables(id)
+            user_id INT NOT NULL,
+            CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(id)
             );
             ''')
         cursor.execute('''
