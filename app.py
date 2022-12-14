@@ -1,8 +1,9 @@
 from flask import Flask, redirect, render_template, request, session
 from github import Github
 from decouple import config
-from database_connection import DatabaseConnection
-import psycopg2
+from database.database_connection import DatabaseConnection
+from lib.user_repository import UserRepository
+from lib.user import User
 import bcrypt
 app = Flask(__name__)
 
@@ -69,37 +70,14 @@ def login():
     # GET
     else:   
 
-        # DATABASE TEST
+        # # DATABASE TEST
         # database_connection = DatabaseConnection()
-        # database_connection.connect('db.bit.io', 'jonas-diete/ttcoach', 'jonas-diete', 'v2_3wdqe_aQbB68hFmX7PFb9Jva6MRgc')
-        connection = psycopg2.connect(
-          host='db.bit.io',
-          database='jonas-diete/ttcoach',
-          user='jonas-diete',
-          password='v2_3wdqe_aQbB68hFmX7PFb9Jva6MRgc')
-
-        cursor = connection.cursor()
-        print('PostgreSQL database version:')
-        cursor.execute('SELECT version()')
-        db_version = cursor.fetchone()
-        print(db_version)
-
-        cursor.execute('''
-          CREATE TABLE IF NOT EXISTS users (
-            user_id SERIAL PRIMARY KEY,
-            username VARCHAR ( 50 ) NOT NULL UNIQUE,
-            password VARCHAR ( 50 ) NOT NULL
-            );
-            ''')
-
-        cursor.execute('''
-          INSERT INTO users (username, password)
-          VALUES ('George', 'iwillbeking');
-            ''')
-
-        cursor.close()
-
-        connection.commit()
+        # connection = database_connection.connect()
+        # user_repository = UserRepository()
+        # new_user = User(0, 'Georgy', 'iwillbeking')
+        # new_user.id = user_repository.create(connection, new_user)
+        # print(f'id: {new_user.id}, username: {new_user.username}, password: {new_user.password}')
+        # connection.close()
 
         # Deleting username in case we were redirected here after logout
         if "username" in session:
@@ -168,26 +146,36 @@ def register():
             encoded_pw = new_pw1.encode('utf-8')
             hashed_password = bcrypt.hashpw(encoded_pw, salt)
 
-            # Updating content
-            updated_file = file.decoded_content.decode() + new_username + " " + hashed_password.decode(encoding='UTF-8') + "\n"
-            # Updating file on github
-            f = repository.update_file(file.path, "Overwriting users.txt", updated_file, file.sha)
+            # Saving new user in database
+            database_connection = DatabaseConnection()
+            connection = database_connection.connect()
+            user_repository = UserRepository()
+            user = User(0, new_username, hashed_password.decode(encoding='UTF-8'))
+            print(f'id: {user.id}, username: {user.username}, password: {user.password}')
+            user.id = user_repository.create(connection, user)
+            print(f'id: {user.id}, username: {user.username}, password: {user.password}')
+            connection.close()
 
-            # Adding entry in medals.txt for the new user
-            # 0 = no medals, 1 = bronze, 2 = silver, 3 = gold
-            # Arranged in order of timestables, starting with 2x
-            file = repository.get_contents("medals.txt")
-            updated_file = file.decoded_content.decode() + new_username + "00000000000\n"
-            f = repository.update_file(file.path, "Overwriting medals.txt", updated_file, file.sha)
+            # # Updating content
+            # updated_file = file.decoded_content.decode() + new_username + " " + hashed_password.decode(encoding='UTF-8') + "\n"
+            # # Updating file on github
+            # f = repository.update_file(file.path, "Overwriting users.txt", updated_file, file.sha)
 
-            # Adding data to learning.txt. Creating a line of correct answers 
-            # for each timestable for the new user. Starting with 2x.
-            file = repository.get_contents("learning.txt")
-            updated_file = file.decoded_content.decode() + new_username + "\n"
-            for i in range(11):
-                updated_file += "000000000000\n"
+            # # Adding entry in medals.txt for the new user
+            # # 0 = no medals, 1 = bronze, 2 = silver, 3 = gold
+            # # Arranged in order of timestables, starting with 2x
+            # file = repository.get_contents("medals.txt")
+            # updated_file = file.decoded_content.decode() + new_username + "00000000000\n"
+            # f = repository.update_file(file.path, "Overwriting medals.txt", updated_file, file.sha)
 
-            f = repository.update_file(file.path, "Overwriting learning.txt", updated_file, file.sha)
+            # # Adding data to learning.txt. Creating a line of correct answers 
+            # # for each timestable for the new user. Starting with 2x.
+            # file = repository.get_contents("learning.txt")
+            # updated_file = file.decoded_content.decode() + new_username + "\n"
+            # for i in range(11):
+            #     updated_file += "000000000000\n"
+
+            # f = repository.update_file(file.path, "Overwriting learning.txt", updated_file, file.sha)
 
             # Checking if user has accepted cookies
             if "cookies" in session:
