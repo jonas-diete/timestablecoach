@@ -14,12 +14,6 @@ class UserRepository:
                 times_learned.append(0)
             cursor.execute(sql, (timestable, False, False, False, times_learned, user.id))
             user.timestables[timestable].id = cursor.fetchone()[0]
-
-            # # for each timestable, inserting how many times each factor has been learned
-            # sql2 = '''INSERT INTO factors_learned(factor, times_learned, timestable_id) VALUES(%s, 0, %s) RETURNING id;'''
-            # for i in range(1, 13):
-            #   cursor.execute(sql2, (i, user.timestables[timestable].id))
-            #   user.timestables[timestable].factors_learned[i].id = cursor.fetchone()[0]
         
         connection.commit()
         cursor.close()
