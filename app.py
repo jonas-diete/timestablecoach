@@ -72,15 +72,6 @@ def login():
     # GET
     else:   
 
-        # # DATABASE TEST
-        # database_connection = DatabaseConnection()
-        # connection = database_connection.connect()
-        # user_repository = UserRepository()
-        # new_user = User(0, 'Georgy', 'iwillbeking')
-        # new_user.id = user_repository.create(connection, new_user)
-        # print(f'id: {new_user.id}, username: {new_user.username}, password: {new_user.password}')
-        # connection.close()
-
         # Deleting username in case we were redirected here after logout
         if "username" in session:
             session.pop("username", default=None) 
