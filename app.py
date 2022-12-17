@@ -5,6 +5,7 @@ from database.database_connection import DatabaseConnection
 from lib.user_repository import UserRepository
 from lib.user import User
 from lib.timestable import Timestable
+from lib.factor_learned import FactorLearned
 import bcrypt
 app = Flask(__name__)
 
@@ -141,8 +142,9 @@ def register():
         else:
             # Saving new username and password in text file on github
             # Getting previous file
-            file = repository.get_contents("users.txt") 
+            # file = repository.get_contents("users.txt") 
 
+            # encrypting password
             salt = bcrypt.gensalt()
             encoded_pw = new_pw1.encode('utf-8')
             hashed_password = bcrypt.hashpw(encoded_pw, salt)
@@ -151,19 +153,36 @@ def register():
             database_connection = DatabaseConnection()
             connection = database_connection.connect()
             
-            # creating a user object
+            # creating a user object, filling it with TimesTable objects and those with FactorsLearned objects
             timestables = {}
             timestables_names = ['twos', 'threes', 'fours', 'fives', 'sixes', 'sevens', 'eights', 'nines', 'tens', 'elevens', 'twelves']
             for name in timestables_names:
-              timestables[name] = Timestable(name)
+                factors_learned = {}
+                for i in range(1, 13):
+                    factors_learned[i] = FactorLearned(i)
+                timestables[name] = Timestable(name, factors_learned)
             user = User(new_username, hashed_password.decode(encoding='UTF-8'), timestables)
 
             # saving new user in database and
-            # getting the newly assigned user id and saving it in user
+            # updating the user object with the correct ids generated from the database
             user_repository = UserRepository()
-            user.id = user_repository.create(connection, user)
+            user = user_repository.create(connection, user)
 
-            # closing database connetion
+            # printing the user to check what's saved
+            print(f'ID: {user.id}')
+            print(f'Username: {user.username}')
+            print(f'Password: {user.password}')
+            for timestable in user.timestables:
+                print(f'Timestable ID: {user.timestables[timestable].id}')
+                print(f'Timestable name: {user.timestables[timestable].name}')
+                print(f'Timestable gold: {user.timestables[timestable].gold}')
+                print(f'Timestable silver: {user.timestables[timestable].silver}')
+                print(f'Timestable bronze: {user.timestables[timestable].bronze}')
+                for factor_learned in user.timestables[timestable].factors_learned:
+                    print(f'Factor Learned factor: {user.timestables[timestable].factors_learned[factor_learned].factor}')
+                    print(f'Factor Learned times_learned: {user.timestables[timestable].factors_learned[factor_learned].times_learned}')
+
+            # closing database connection
             connection.close()
 
             # # Updating content

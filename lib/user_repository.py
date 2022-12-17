@@ -7,14 +7,21 @@ class UserRepository:
         user.id = cursor.fetchone()[0]
 
         # inserting into timestables
-        sql = '''INSERT INTO timestables(name, bronze, silver, gold, user_id) VALUES(%s, %s, %s, %s, %s) RETURNING id;'''
+        sql = '''INSERT INTO timestables(name, bronze, silver, gold, times_learned, user_id) VALUES(%s, %s, %s, %s, %s, %s) RETURNING id;'''
         for timestable in user.timestables:
-            cursor.execute(sql, (timestable, False, False, False, user.id))
+            times_learned = []
+            for i in range(12):
+                times_learned.append(0)
+            cursor.execute(sql, (timestable, False, False, False, times_learned, user.id))
             user.timestables[timestable].id = cursor.fetchone()[0]
 
-        # todo: inserting into factors_learned
-
+            # # for each timestable, inserting how many times each factor has been learned
+            # sql2 = '''INSERT INTO factors_learned(factor, times_learned, timestable_id) VALUES(%s, 0, %s) RETURNING id;'''
+            # for i in range(1, 13):
+            #   cursor.execute(sql2, (i, user.timestables[timestable].id))
+            #   user.timestables[timestable].factors_learned[i].id = cursor.fetchone()[0]
+        
         connection.commit()
         cursor.close()
         
-        return user.id
+        return user
