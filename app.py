@@ -1,6 +1,11 @@
 from flask import Flask, redirect, render_template, request, session
 from github import Github
 from decouple import config
+from database.database_connection import DatabaseConnection
+from lib.user_repository import UserRepository
+from lib.user import User
+from lib.timestable import Timestable
+from lib.factor_learned import FactorLearned
 import bcrypt
 app = Flask(__name__)
 
@@ -64,7 +69,9 @@ def login():
         else:
             return render_template("login.html", login_message = "You must accept the cookies to continue.", cookies = "")
     
+    # GET
     else:   
+
         # Deleting username in case we were redirected here after logout
         if "username" in session:
             session.pop("username", default=None) 
@@ -130,32 +137,69 @@ def register():
         else:
             # Saving new username and password in text file on github
             # Getting previous file
-            file = repository.get_contents("users.txt") 
+            # file = repository.get_contents("users.txt") 
 
+            # encrypting password
             salt = bcrypt.gensalt()
             encoded_pw = new_pw1.encode('utf-8')
             hashed_password = bcrypt.hashpw(encoded_pw, salt)
 
-            # Updating content
-            updated_file = file.decoded_content.decode() + new_username + " " + hashed_password.decode(encoding='UTF-8') + "\n"
-            # Updating file on github
-            f = repository.update_file(file.path, "Overwriting users.txt", updated_file, file.sha)
+            # connecting with database
+            database_connection = DatabaseConnection()
+            connection = database_connection.connect()
+            
+            # creating a user object, filling it with TimesTable objects and those with FactorsLearned objects
+            timestables = {}
+            timestables_names = ['twos', 'threes', 'fours', 'fives', 'sixes', 'sevens', 'eights', 'nines', 'tens', 'elevens', 'twelves']
+            for name in timestables_names:
+                factors_learned = {}
+                for i in range(1, 13):
+                    factors_learned[i] = FactorLearned(i)
+                timestables[name] = Timestable(name, factors_learned)
+            user = User(new_username, hashed_password.decode(encoding='UTF-8'), timestables)
 
-            # Adding entry in medals.txt for the new user
-            # 0 = no medals, 1 = bronze, 2 = silver, 3 = gold
-            # Arranged in order of timestables, starting with 2x
-            file = repository.get_contents("medals.txt")
-            updated_file = file.decoded_content.decode() + new_username + "00000000000\n"
-            f = repository.update_file(file.path, "Overwriting medals.txt", updated_file, file.sha)
+            # saving new user in database and
+            # updating the user object with the correct ids generated from the database
+            user_repository = UserRepository()
+            user = user_repository.create(connection, user)
 
-            # Adding data to learning.txt. Creating a line of correct answers 
-            # for each timestable for the new user. Starting with 2x.
-            file = repository.get_contents("learning.txt")
-            updated_file = file.decoded_content.decode() + new_username + "\n"
-            for i in range(11):
-                updated_file += "000000000000\n"
+            # printing the user to check what's saved
+            print(f'ID: {user.id}')
+            print(f'Username: {user.username}')
+            print(f'Password: {user.password}')
+            for timestable in user.timestables:
+                print(f'Timestable ID: {user.timestables[timestable].id}')
+                print(f'Timestable name: {user.timestables[timestable].name}')
+                print(f'Timestable gold: {user.timestables[timestable].gold}')
+                print(f'Timestable silver: {user.timestables[timestable].silver}')
+                print(f'Timestable bronze: {user.timestables[timestable].bronze}')
+                for factor_learned in user.timestables[timestable].factors_learned:
+                    print(f'Factor Learned factor: {user.timestables[timestable].factors_learned[factor_learned].factor}')
+                    print(f'Factor Learned times_learned: {user.timestables[timestable].factors_learned[factor_learned].times_learned}')
 
-            f = repository.update_file(file.path, "Overwriting learning.txt", updated_file, file.sha)
+            # closing database connection
+            connection.close()
+
+            # # Updating content
+            # updated_file = file.decoded_content.decode() + new_username + " " + hashed_password.decode(encoding='UTF-8') + "\n"
+            # # Updating file on github
+            # f = repository.update_file(file.path, "Overwriting users.txt", updated_file, file.sha)
+
+            # # Adding entry in medals.txt for the new user
+            # # 0 = no medals, 1 = bronze, 2 = silver, 3 = gold
+            # # Arranged in order of timestables, starting with 2x
+            # file = repository.get_contents("medals.txt")
+            # updated_file = file.decoded_content.decode() + new_username + "00000000000\n"
+            # f = repository.update_file(file.path, "Overwriting medals.txt", updated_file, file.sha)
+
+            # # Adding data to learning.txt. Creating a line of correct answers 
+            # # for each timestable for the new user. Starting with 2x.
+            # file = repository.get_contents("learning.txt")
+            # updated_file = file.decoded_content.decode() + new_username + "\n"
+            # for i in range(11):
+            #     updated_file += "000000000000\n"
+
+            # f = repository.update_file(file.path, "Overwriting learning.txt", updated_file, file.sha)
 
             # Logging in
             session["username"] = new_username
