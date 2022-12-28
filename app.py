@@ -94,21 +94,7 @@ def register():
         new_username = request.form.get("username")
         new_pw1 = request.form.get("password1")
         new_pw2 = request.form.get("password2")
-        
-        # Checking if username exists already
-        # users = []
-        # file = repository.get_contents("users.txt")
-        # for row in file.decoded_content.decode().split("\n"):
-        #     if row:     # This is checking if the row is "true", i.e. not empty
-        #         username_to_save = ""
-        #         if row:     # This is checking if the row is "true", i.e. not empty
-        #             # Saving every character in a new string until we get to a space (delimiter)
-        #             for char in row:
-        #                 if char != " ":
-        #                     username_to_save += char
-        #                 else:
-        #                     break
-        #         users.append(username_to_save)
+
         if not "cookies" in session:
             return render_template("register.html", register_message = "Please accept the cookies.")
 
