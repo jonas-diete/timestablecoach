@@ -23,6 +23,8 @@ class UserRepository:
         cursor.close()
         
         return user
+
+        
     def get_one(self, connection, username):
         cursor = connection.cursor()
         user_name = username
@@ -60,18 +62,4 @@ class UserRepository:
         cursor.close()
         
         user = User(username, password, timestables, user_id)
-
-        # printing the user to check what's saved
-        print(f'ID: {user.id}')
-        print(f'Username: {user.username}')
-        print(f'Password: {user.password}')
-        for timestable in user.timestables:
-            print(f'Timestable ID: {user.timestables[timestable].id}')
-            print(f'Timestable name: {user.timestables[timestable].name}')
-            print(f'Timestable gold: {user.timestables[timestable].gold}')
-            print(f'Timestable silver: {user.timestables[timestable].silver}')
-            print(f'Timestable bronze: {user.timestables[timestable].bronze}')
-            for factor_learned in user.timestables[timestable].factors_learned:
-                print(f'Factor Learned factor: {user.timestables[timestable].factors_learned[factor_learned].factor}')
-                print(f'Factor Learned times_learned: {user.timestables[timestable].factors_learned[factor_learned].times_learned}')
         return user
