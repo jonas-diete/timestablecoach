@@ -19,6 +19,11 @@ GITHUB_TOKEN = config('GITHUB_TOKEN')
 github = Github(GITHUB_TOKEN)
 repository = github.get_user().get_repo("timestable-coach-data")
 
+# Creating database connection object - this can later be used to connect
+database_connection = DatabaseConnection()
+
+# creating user repository object
+user_repository = UserRepository()
 
 @app.route("/")
 def index():
@@ -91,23 +96,23 @@ def register():
         new_pw2 = request.form.get("password2")
         
         # Checking if username exists already
-        users = []
-        file = repository.get_contents("users.txt")
-        for row in file.decoded_content.decode().split("\n"):
-            if row:     # This is checking if the row is "true", i.e. not empty
-                username_to_save = ""
-                if row:     # This is checking if the row is "true", i.e. not empty
-                    # Saving every character in a new string until we get to a space (delimiter)
-                    for char in row:
-                        if char != " ":
-                            username_to_save += char
-                        else:
-                            break
-                users.append(username_to_save)
+        # users = []
+        # file = repository.get_contents("users.txt")
+        # for row in file.decoded_content.decode().split("\n"):
+        #     if row:     # This is checking if the row is "true", i.e. not empty
+        #         username_to_save = ""
+        #         if row:     # This is checking if the row is "true", i.e. not empty
+        #             # Saving every character in a new string until we get to a space (delimiter)
+        #             for char in row:
+        #                 if char != " ":
+        #                     username_to_save += char
+        #                 else:
+        #                     break
+        #         users.append(username_to_save)
         if not "cookies" in session:
             return render_template("register.html", register_message = "Please accept the cookies.")
 
-        elif new_username in users:
+        elif user_repository.get_one(database_connection.connect(), new_username) != False:
             return render_template("register.html", register_message = "Username exists already. Try again.")
         
         # Checking if terms and conditions have been agreed to
@@ -145,7 +150,6 @@ def register():
             hashed_password = bcrypt.hashpw(encoded_pw, salt)
 
             # connecting with database
-            database_connection = DatabaseConnection()
             connection = database_connection.connect()
             
             # creating a user object, filling it with TimesTable objects and those with FactorsLearned objects
@@ -160,7 +164,6 @@ def register():
 
             # saving new user in database and
             # updating the user object with the correct ids generated from the database
-            user_repository = UserRepository()
             user = user_repository.create(connection, user)
 
             # printing the user to check what's saved
