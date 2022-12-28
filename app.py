@@ -140,10 +140,6 @@ def register():
             return render_template("register.html", register_message = "Password must be at least 4 characters long. Try again.")
         
         else:
-            # Saving new username and password in text file on github
-            # Getting previous file
-            # file = repository.get_contents("users.txt") 
-
             # encrypting password
             salt = bcrypt.gensalt()
             encoded_pw = new_pw1.encode('utf-8')
@@ -182,27 +178,6 @@ def register():
 
             # closing database connection
             connection.close()
-
-            # # Updating content
-            # updated_file = file.decoded_content.decode() + new_username + " " + hashed_password.decode(encoding='UTF-8') + "\n"
-            # # Updating file on github
-            # f = repository.update_file(file.path, "Overwriting users.txt", updated_file, file.sha)
-
-            # # Adding entry in medals.txt for the new user
-            # # 0 = no medals, 1 = bronze, 2 = silver, 3 = gold
-            # # Arranged in order of timestables, starting with 2x
-            # file = repository.get_contents("medals.txt")
-            # updated_file = file.decoded_content.decode() + new_username + "00000000000\n"
-            # f = repository.update_file(file.path, "Overwriting medals.txt", updated_file, file.sha)
-
-            # # Adding data to learning.txt. Creating a line of correct answers 
-            # # for each timestable for the new user. Starting with 2x.
-            # file = repository.get_contents("learning.txt")
-            # updated_file = file.decoded_content.decode() + new_username + "\n"
-            # for i in range(11):
-            #     updated_file += "000000000000\n"
-
-            # f = repository.update_file(file.path, "Overwriting learning.txt", updated_file, file.sha)
 
             # Logging in
             session["username"] = new_username
