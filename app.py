@@ -70,6 +70,7 @@ def login():
 def register():
     if request.method == "POST":
 
+        # getting user data
         new_username = request.form.get("username")
         new_pw1 = request.form.get("password1")
         new_pw2 = request.form.get("password2")
@@ -147,8 +148,8 @@ def register():
             # Logging in
             session["username"] = new_username
             return redirect("/select")
-      
-    else:
+    
+    elif request.method == 'GET':
         # Checking if user has accepted cookies
         if "cookies" in session:
             return render_template("register.html", register_message = "Register a new user.", cookies = "yes")
