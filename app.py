@@ -78,79 +78,79 @@ def register():
         if not "cookies" in session:
             return render_template("register.html", register_message = "Please accept the cookies.")
 
-        elif user_repository.get_one(database_connection.connect(), new_username) != False:
+        if user_repository.get_one(database_connection.connect(), new_username) != False:
             return render_template("register.html", register_message = "Username exists already. Try again.")
         
         # Checking if terms and conditions have been agreed to
-        elif request.form.get("agreement") != "agreed":
+        if request.form.get("agreement") != "agreed":
             return render_template("register.html", register_message = "Please accept the Terms and Conditions.")
 
         # Checking if username is alphanumeric
-        elif not new_username.isalnum():
+        if not new_username.isalnum():
             return render_template("register.html", register_message = "Only letters or numbers allowed for username. Try again.")
         
         # Checking if username has at least 2 characters
-        elif len(new_username) < 2:
+        if len(new_username) < 2:
             return render_template("register.html", register_message = "Please enter a longer username.")
 
         # Checking if passwords match
-        elif new_pw1 != new_pw2:
+        if new_pw1 != new_pw2:
             return render_template("register.html", register_message = "Passwords don't match. Try again.")
         
         # Checking there are no spaces in password
-        elif " " in new_pw1:
+        if " " in new_pw1:
             return render_template("register.html", register_message = "No spaces allowed in password. Try again.")
         
         # Checking new password has at least 4 characters
-        elif len(new_pw1) < 4:
+        if len(new_pw1) < 4:
             return render_template("register.html", register_message = "Password must be at least 4 characters long. Try again.")
         
-        else:
-            # encrypting password
-            salt = bcrypt.gensalt()
-            encoded_pw = new_pw1.encode('utf-8')
-            hashed_password = bcrypt.hashpw(encoded_pw, salt)
+        # REGISTERING NEW USER
+        # encrypting password
+        salt = bcrypt.gensalt()
+        encoded_pw = new_pw1.encode('utf-8')
+        hashed_password = bcrypt.hashpw(encoded_pw, salt)
 
-            # connecting with database
-            connection = database_connection.connect()
-            
-            # creating a user object, filling it with TimesTable objects and those with FactorsLearned objects
-            timestables = {}
-            timestables_names = ['twos', 'threes', 'fours', 'fives', 'sixes', 'sevens', 'eights', 'nines', 'tens', 'elevens', 'twelves']
-            for name in timestables_names:
-                factors_learned = {}
-                for i in range(1, 13):
-                    factors_learned[i] = FactorLearned(i)
-                timestables[name] = Timestable(name, factors_learned)
-            user = User(new_username, hashed_password.decode(encoding='UTF-8'), timestables)
+        # connecting with database
+        connection = database_connection.connect()
+        
+        # creating a user object, filling it with TimesTable objects and those with FactorsLearned objects
+        timestables = {}
+        timestables_names = ['twos', 'threes', 'fours', 'fives', 'sixes', 'sevens', 'eights', 'nines', 'tens', 'elevens', 'twelves']
+        for name in timestables_names:
+            factors_learned = {}
+            for i in range(1, 13):
+                factors_learned[i] = FactorLearned(i)
+            timestables[name] = Timestable(name, factors_learned)
+        user = User(new_username, hashed_password.decode(encoding='UTF-8'), timestables)
 
-            # saving new user in database and
-            # updating the user object with the correct ids generated from the database
-            user = user_repository.create(connection, user)
+        # saving new user in database and
+        # updating the user object with the correct ids generated from the database
+        user = user_repository.create(connection, user)
 
-            # printing the user to check what's saved
-            print(f'ID: {user.id}')
-            print(f'Username: {user.username}')
-            print(f'Password: {user.password}')
-            for timestable in user.timestables:
-                print(f'Timestable ID: {user.timestables[timestable].id}')
-                print(f'Timestable name: {user.timestables[timestable].name}')
-                print(f'Timestable gold: {user.timestables[timestable].gold}')
-                print(f'Timestable silver: {user.timestables[timestable].silver}')
-                print(f'Timestable bronze: {user.timestables[timestable].bronze}')
-                for factor_learned in user.timestables[timestable].factors_learned:
-                    print(f'Factor Learned factor: {user.timestables[timestable].factors_learned[factor_learned].factor}')
-                    print(f'Factor Learned times_learned: {user.timestables[timestable].factors_learned[factor_learned].times_learned}')
+        # printing the user to check what's saved
+        print(f'ID: {user.id}')
+        print(f'Username: {user.username}')
+        print(f'Password: {user.password}')
+        for timestable in user.timestables:
+            print(f'Timestable ID: {user.timestables[timestable].id}')
+            print(f'Timestable name: {user.timestables[timestable].name}')
+            print(f'Timestable gold: {user.timestables[timestable].gold}')
+            print(f'Timestable silver: {user.timestables[timestable].silver}')
+            print(f'Timestable bronze: {user.timestables[timestable].bronze}')
+            for factor_learned in user.timestables[timestable].factors_learned:
+                print(f'Factor Learned factor: {user.timestables[timestable].factors_learned[factor_learned].factor}')
+                print(f'Factor Learned times_learned: {user.timestables[timestable].factors_learned[factor_learned].times_learned}')
 
-            # closing database connection
-            connection.close()
+        # closing database connection
+        connection.close()
 
-            # Logging in
-            session["username"] = new_username
-            return redirect("/select")
+        # Logging in
+        session["username"] = new_username
+        return redirect("/select")
     
     elif request.method == 'GET':
-        # Checking if user has accepted cookies
+        # Checking if user has accepted cookies and displaying register page
         if "cookies" in session:
             return render_template("register.html", register_message = "Register a new user.", cookies = "yes")
         else:
