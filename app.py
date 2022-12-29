@@ -66,62 +66,6 @@ def login():
         else:
             return render_template("login.html", login_message = "Enter your login details.", cookies = "")
 
-    # # ----------- OLD CODE delete later! -------------
-    # if request.method == "POST":
-    #     if request.form.get("accepted") == "yes":
-    #         session["cookies"] = "yes"
-        
-    #     # --- Reading text file and creating a users dictionary with usernames and passwords ---
-    #     users = {}
-    #     # Getting file from GitHub
-    #     file = repository.get_contents("users.txt")
-    #     # Decoding file and iterating through it
-    #     for row in file.decoded_content.decode().split("\n"):
-    #         username_to_save = ""
-    #         if row:     # This is checking if the row is "true", i.e. not empty
-    #             # Saving every character in a new string until we get to a space (delimiter)
-    #             for char in row:
-    #                 if char != " ":
-    #                     username_to_save += char
-    #                 else:
-    #                     break
-    #             # Saving the new string as username and the rest of the row (minus the newline char) as the password
-    #             users[username_to_save] = row[len(username_to_save) + 1:]
-
-    #     # Checking if cookies have been accepted
-    #     if "cookies" in session:   
-    #         username_entered = request.form.get("username")
-    #         password_entered = request.form.get("password")
-
-    #         # username exists
-    #         if username_entered in users:
-    #             stored_password = users[username_entered]
-    #             # password correct
-    #             if bcrypt.checkpw(password_entered.encode('utf-8'), stored_password.encode('utf-8')):
-    #                 # Logging in
-    #                 session["username"] = username_entered
-    #                 return redirect("/select")
-    #             # password wrong
-    #             else:
-    #                 return render_template("login.html", login_message = "Incorrect username or password. Try again.", cookies = "yes")
-    #         # username doesn't exist
-    #         else:
-    #             return render_template("login.html", login_message = "Incorrect username or password. Try again.", cookies = "yes")
-    #     else:
-    #         return render_template("login.html", login_message = "You must accept the cookies to continue.", cookies = "")
-    
-    # # GET
-    # else:   
-    #     # Deleting username in case we were redirected here after logout
-    #     if "username" in session:
-    #         session.pop("username", default=None) 
-
-    #     # Checking if user has accepted cookies
-    #     if "cookies" in session:
-    #         return render_template("login.html", login_message = "Enter your login details.", cookies = "yes")
-    #     else:
-    #         return render_template("login.html", login_message = "Enter your login details.", cookies = "")
-
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
