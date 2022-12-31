@@ -68,6 +68,11 @@ def login():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    if 'cookies' in session:
+        cookies = 'yes'
+    else:
+        cookies = 'no'
+
     if request.method == "POST":
 
         # getting user data
@@ -75,35 +80,35 @@ def register():
         new_pw1 = request.form.get("password1")
         new_pw2 = request.form.get("password2")
 
-        if not "cookies" in session:
-            return render_template("register.html", register_message = "Please accept the cookies.")
+        if cookies == 'no':
+            return render_template("register.html", register_message = "Please accept the cookies.", cookies = cookies)
 
         if user_repository.get_one(database_connection.connect(), new_username) != False:
-            return render_template("register.html", register_message = "Username exists already. Try again.")
+            return render_template("register.html", register_message = "Username exists already. Try again.", cookies = cookies)
         
         # Checking if terms and conditions have been agreed to
         if request.form.get("agreement") != "agreed":
-            return render_template("register.html", register_message = "Please accept the Terms and Conditions.")
+            return render_template("register.html", register_message = "Please accept the Terms and Conditions.", cookies = cookies)
 
         # Checking if username is alphanumeric
         if not new_username.isalnum():
-            return render_template("register.html", register_message = "Only letters or numbers allowed for username. Try again.")
+            return render_template("register.html", register_message = "Only letters or numbers allowed for username. Try again.", cookies = cookies)
         
         # Checking if username has at least 2 characters
         if len(new_username) < 2:
-            return render_template("register.html", register_message = "Please enter a longer username.")
+            return render_template("register.html", register_message = "Please enter a longer username.", cookies = cookies)
 
         # Checking if passwords match
         if new_pw1 != new_pw2:
-            return render_template("register.html", register_message = "Passwords don't match. Try again.")
+            return render_template("register.html", register_message = "Passwords don't match. Try again.", cookies = cookies)
         
         # Checking there are no spaces in password
         if " " in new_pw1:
-            return render_template("register.html", register_message = "No spaces allowed in password. Try again.")
+            return render_template("register.html", register_message = "No spaces allowed in password. Try again.", cookies = cookies)
         
         # Checking new password has at least 4 characters
         if len(new_pw1) < 4:
-            return render_template("register.html", register_message = "Password must be at least 4 characters long. Try again.")
+            return render_template("register.html", register_message = "Password must be at least 4 characters long. Try again.", cookies = cookies)
         
         # REGISTERING NEW USER
         # encrypting password
@@ -150,11 +155,7 @@ def register():
         return redirect("/select")
     
     elif request.method == 'GET':
-        # Checking if user has accepted cookies and displaying register page
-        if "cookies" in session:
-            return render_template("register.html", register_message = "Register a new user.", cookies = "yes")
-        else:
-            return render_template("register.html", register_message = "Register a new user.", cookies = "")
+        return render_template("register.html", register_message = "Register a new user.", cookies = cookies)
 
 @app.route("/terms", methods=["GET"])
 def terms():
