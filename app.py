@@ -25,6 +25,9 @@ database_connection = DatabaseConnection()
 # creating user repository object
 user_repository = UserRepository()
 
+# defining global user variable, that stores all the user data
+user = False
+
 @app.route("/")
 def index():
     return redirect("/login")
@@ -44,10 +47,8 @@ def login():
         password_entered = request.form.get("password")
 
         # checking if user exists and password is correct
+        global user
         user = user_repository.get_one(database_connection.connect(), username_entered) 
-        print(user.username)
-        print(password_entered)
-        print(user.password) 
         if user == False or not bcrypt.checkpw(password_entered.encode('utf-8'), user.password.encode('utf-8')):
             return render_template("login.html", login_message = "Incorrect username or password. Try again.", cookies = "yes")
         
@@ -127,6 +128,7 @@ def register():
             for i in range(1, 13):
                 factors_learned[i] = FactorLearned(i)
             timestables[name] = Timestable(name, factors_learned)
+        global user
         user = User(new_username, hashed_password.decode(encoding='UTF-8'), timestables)
 
         # saving new user in database and
@@ -163,12 +165,12 @@ def terms():
 
 @app.route("/select", methods=["GET", "POST"])
 def select():
-    
-    if not "username" in session:
+    global user
+    if not "username" in session or user == False:
         return redirect("/login")
     else:
         if request.method == "POST":
-                
+
             # Saving the timestable the user has selected
             tt_selected = request.form.get("timestable")
 
@@ -178,16 +180,38 @@ def select():
             else:
                 return redirect("/practise/" + tt_selected)
         
-        else:
-            # Getting medal-data from file saved on github and saving it in user_medals
+        # filling user_medals_string so it is a string of 0, 1, 2, or 3s 
+        # each indicating which medal has been earned for this timestable
+        # '02301102021' means no medals for the twos, a silver for the threes, 
+        # a gold for the fours, no medals for the fives, etc.
+        elif request.method == "GET":
+            timestables_names = ['twos', 'threes', 'fours', 'fives', 'sixes', 'sevens', 'eights', 'nines', 'tens', 'elevens', 'twelves']
             user_medals_str = ""
-            file = repository.get_contents("medals.txt")
-            for row in file.decoded_content.decode().split("\n"):
-                # Searching for username and checking there is not a longer username which includes the current one
-                if session["username"] in row and len(row) == len(session["username"]) + 11:
-                    user_medals_str = row[len(session["username"]):]
+            for timestable_name in timestables_names:
+                if user.timestables[timestable_name].gold == True:
+                    user_medals_str += '3'
+                elif user.timestables[timestable_name].silver == True:
+                    user_medals_str += '2'
+                elif user.timestables[timestable_name].bronze == True:
+                    user_medals_str += '1'
+                else:
+                    user_medals_str += '0'
+
             # Loading page
-            return render_template("select.html", username = session["username"], tts = range(3, 13), medals = user_medals_str)
+            return render_template("select.html", username = session["username"], tts = range(3, 13), medals = user_medals_str)                
+          
+
+            # # OLD CODE DELETE LATER
+            # # Getting medal-data from file saved on github and saving it in user_medals
+            # user_medals_str = ""
+            # file = repository.get_contents("medals.txt")
+            # for row in file.decoded_content.decode().split("\n"):
+            #     # Searching for username and checking there is not a longer username which includes the current one
+            #     if session["username"] in row and len(row) == len(session["username"]) + 11:
+            #         user_medals_str = row[len(session["username"]):]
+
+
+
     
 
 @app.route("/test/<tt>", methods=["GET", "POST"])

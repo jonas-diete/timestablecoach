@@ -56,7 +56,7 @@ class UserRepository:
               factors_learned[j + 1] = FactorLearned(j + 1, timestable_from_db[5][j])
 
             # creating new Timestable object
-            timestables[timestables_names[i]] = Timestable(timestable_from_db[1], factors_learned, timestable_from_db[2], timestable_from_db[3], timestable_from_db[4], timestable_from_db[0])
+            timestables[timestable_from_db[1]] = Timestable(timestable_from_db[1], factors_learned, timestable_from_db[4], timestable_from_db[3], timestable_from_db[2], timestable_from_db[0])
 
         connection.commit()
         cursor.close()
