@@ -210,10 +210,6 @@ def select():
             #     if session["username"] in row and len(row) == len(session["username"]) + 11:
             #         user_medals_str = row[len(session["username"]):]
 
-
-
-    
-
 @app.route("/test/<tt>", methods=["GET", "POST"])
 def test(tt):
     if not "username" in session:
@@ -221,36 +217,53 @@ def test(tt):
     else:
         if request.method == "GET":
             return render_template("test.html", timestable = tt, username = session["username"])
-        else:  # Data was sent through POST
+        elif request.method == 'POST':
+            
+            # converting the tt, which is an int, into a timestable name to use within our user object
+            converter = {2:'twos', 3:'threes', 4:'fours', 5:'fives', 6:'sixes', 7:'sevens', 8:'eights', 9:'nines', 10:'tens', 11:'elevens', 12:'twelves'}
+            tt = converter[tt]
+            
             # Receiving which medal was won, when timestable test was completed
             medal_earned = request.form.get("medal_earned")
+            global user
+            if medal_earned == 3:
+                user.timestables[tt].gold == True
+            elif medal_earned == 2:
+                user.timestables[tt].silver == True
+            elif medal_earned == 1:
+                user.timestables[tt].bronze == True
 
-            if int(medal_earned) > 0:
-                # Saving all medals from all users from file into all_medals dictionary
-                all_medals = {}
-                file = repository.get_contents("medals.txt")
-                for row in file.decoded_content.decode().split("\n"):
-                    medals_of_user = []
-                    medals_of_user_str = row[len(row) - 11:]
-                    for i in medals_of_user_str:
-                        medals_of_user.append(i)
-                    all_medals[row[:len(row) - 11]] = medals_of_user
+            # Todo:
+            # Save new medal updates in database
 
-                # Updating all_medals with the medal earned from current user and current timestable
-                for user in all_medals:
-                    # Checking if new medal is actually better than the old one
-                    if user == session["username"] and all_medals[user][int(tt) - 2] < medal_earned:
-                        all_medals[user][int(tt) - 2] = medal_earned
 
-                # Overwriting whole content of text file with updated all_medals
-                file = repository.get_contents("medals.txt")
-                updated_file = ""
-                for user in all_medals:
-                    medals_of_user_str = ""
-                    for medal in all_medals[user]:
-                        medals_of_user_str += medal
-                    updated_file += user + medals_of_user_str + "\n"
-                repository.update_file(file.path, "Overwriting medals.txt", updated_file, file.sha)
+            # OLD CODE DELETE LATER
+            # if int(medal_earned) > 0:
+            #     # Saving all medals from all users from file into all_medals dictionary
+            #     all_medals = {}
+            #     file = repository.get_contents("medals.txt")
+            #     for row in file.decoded_content.decode().split("\n"):
+            #         medals_of_user = []
+            #         medals_of_user_str = row[len(row) - 11:]
+            #         for i in medals_of_user_str:
+            #             medals_of_user.append(i)
+            #         all_medals[row[:len(row) - 11]] = medals_of_user
+
+            #     # Updating all_medals with the medal earned from current user and current timestable
+            #     for user in all_medals:
+            #         # Checking if new medal is actually better than the old one
+            #         if user == session["username"] and all_medals[user][int(tt) - 2] < medal_earned:
+            #             all_medals[user][int(tt) - 2] = medal_earned
+
+            #     # Overwriting whole content of text file with updated all_medals
+            #     file = repository.get_contents("medals.txt")
+            #     updated_file = ""
+            #     for user in all_medals:
+            #         medals_of_user_str = ""
+            #         for medal in all_medals[user]:
+            #             medals_of_user_str += medal
+            #         updated_file += user + medals_of_user_str + "\n"
+            #     repository.update_file(file.path, "Overwriting medals.txt", updated_file, file.sha)
             
             return redirect("/select") 
 

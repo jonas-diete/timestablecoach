@@ -45,9 +45,8 @@ class UserRepository:
         all_timestables = cursor.fetchall()
 
         # Creating timestables dictionary
-        timestables_names = ['twos', 'threes', 'fours', 'fives', 'sixes', 'sevens', 'eights', 'nines', 'tens', 'elevens', 'twelves']
         timestables = {}
-        for i in range(len(timestables_names)):
+        for i in range(11):
             timestable_from_db = all_timestables[i]
 
             # creating factors_learned dictionary filled with FactorsLearned objects
