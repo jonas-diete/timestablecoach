@@ -233,37 +233,9 @@ def test(tt):
             elif medal_earned == '1':
                 user.timestables[timestable].bronze = True
 
+            # updating medal in database
             timestable_repo = TimestableRepository()
             timestable_repo.update_medal(database_connection.connect(), user, user.timestables[timestable])
-
-
-            # OLD CODE DELETE LATER
-            # if int(medal_earned) > 0:
-            #     # Saving all medals from all users from file into all_medals dictionary
-            #     all_medals = {}
-            #     file = repository.get_contents("medals.txt")
-            #     for row in file.decoded_content.decode().split("\n"):
-            #         medals_of_user = []
-            #         medals_of_user_str = row[len(row) - 11:]
-            #         for i in medals_of_user_str:
-            #             medals_of_user.append(i)
-            #         all_medals[row[:len(row) - 11]] = medals_of_user
-
-            #     # Updating all_medals with the medal earned from current user and current timestable
-            #     for user in all_medals:
-            #         # Checking if new medal is actually better than the old one
-            #         if user == session["username"] and all_medals[user][int(tt) - 2] < medal_earned:
-            #             all_medals[user][int(tt) - 2] = medal_earned
-
-            #     # Overwriting whole content of text file with updated all_medals
-            #     file = repository.get_contents("medals.txt")
-            #     updated_file = ""
-            #     for user in all_medals:
-            #         medals_of_user_str = ""
-            #         for medal in all_medals[user]:
-            #             medals_of_user_str += medal
-            #         updated_file += user + medals_of_user_str + "\n"
-            #     repository.update_file(file.path, "Overwriting medals.txt", updated_file, file.sha)
             
             return redirect("/select") 
 
