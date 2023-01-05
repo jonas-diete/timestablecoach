@@ -200,16 +200,6 @@ def select():
 
             # Loading page
             return render_template("select.html", username = session["username"], tts = range(3, 13), medals = user_medals_str)                
-          
-
-            # # OLD CODE DELETE LATER
-            # # Getting medal-data from file saved on github and saving it in user_medals
-            # user_medals_str = ""
-            # file = repository.get_contents("medals.txt")
-            # for row in file.decoded_content.decode().split("\n"):
-            #     # Searching for username and checking there is not a longer username which includes the current one
-            #     if session["username"] in row and len(row) == len(session["username"]) + 11:
-            #         user_medals_str = row[len(session["username"]):]
 
 @app.route("/test/<tt>", methods=["GET", "POST"])
 def test(tt):
