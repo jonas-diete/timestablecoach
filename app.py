@@ -29,6 +29,11 @@ user_repository = UserRepository()
 # defining global user variable, that stores all the user data
 user = False
 
+# converts the tt, which is an int written in the url, into a timestable name to use within our user object
+def convert_number_to_timestable(number):
+    converter = {'2':'twos', '3':'threes', '4':'fours', '5':'fives', '6':'sixes', '7':'sevens', '8':'eights', '9':'nines', '10':'tens', '11':'elevens', '12':'twelves'}
+    return converter[number]
+
 @app.route("/")
 def index():
     return redirect("/login")
@@ -209,10 +214,7 @@ def test(tt):
         if request.method == "GET":
             return render_template("test.html", timestable = tt, username = session["username"])
         elif request.method == 'POST':
-            
-            # converting the tt, which is an int, into a timestable name to use within our user object
-            converter = {'2':'twos', '3':'threes', '4':'fours', '5':'fives', '6':'sixes', '7':'sevens', '8':'eights', '9':'nines', '10':'tens', '11':'elevens', '12':'twelves'}
-            timestable = converter[tt]
+            timestable = convert_number_to_timestable(tt)
             # Receiving which medal was won, when timestable test was completed
             medal_earned = request.form.get("medal_earned")
             global user
@@ -235,31 +237,38 @@ def practise(tt):
     if not "username" in session:
         return redirect("/login")
     else:
-        # Page is loaded normally
         if request.method == "GET":
-            # Getting the data about which facts have been learned from the selected timestable
             learningdata = ""
-            x = 0
-            file = repository.get_contents("learning.txt")
-            for row in file.decoded_content.decode().split("\n"):
-                if row:
-                    # Finding correct timestable row
-                    if x == int(tt):
-                        for item in row:
-                            learningdata += item
-                        break
-                    else:
-                        if x > 0:
-                            x += 1
-                    # Finding correct user
-                    if row == session["username"]:
-                        x = 2
+            timestable = convert_number_to_timestable(tt)
+            for i in user.timestables[timestable].factors_learned:
+                print('The factor is: ' + str(user.timestables[timestable].factors_learned[i].factor))
+                print('And it has been learned ' + str(user.timestables[timestable].factors_learned[i].times_learned) + ' times.')
+                learningdata += str(user.timestables[timestable].factors_learned[i].times_learned)
+
+            # OLD CODE - DELETE LATER
+            #
+            # # Getting the data about which facts have been learned from the selected timestable
+            # learningdata = ""
+            # x = 0
+            # file = repository.get_contents("learning.txt")
+            # for row in file.decoded_content.decode().split("\n"):
+            #     if row:
+            #         # Finding correct timestable row
+            #         if x == int(tt):
+            #             for item in row:
+            #                 learningdata += item
+            #             break
+            #         else:
+            #             if x > 0:
+            #                 x += 1
+            #         # Finding correct user
+            #         if row == session["username"]:
+            #             x = 2
                         
             # Sending the learning data to be used in practise.html
             return render_template("practise.html", timestable = int(tt), username = session["username"], numbers = range(1,13), learningdata = learningdata)
         
-        # Data has been received through POST
-        else:
+        elif request.method == 'POST':
             learningdata_updated = request.form.get("learningdata_updated")
             
             updated_file = ""
