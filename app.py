@@ -13,13 +13,6 @@ app = Flask(__name__)
 # getting key for signing the cookies from .env file
 app.secret_key = config('COOKIES_KEY')
 
-# getting github auth token from .env file
-GITHUB_TOKEN = config('GITHUB_TOKEN')
-
-# access github repo to save data on
-github = Github(GITHUB_TOKEN)
-repository = github.get_user().get_repo("timestable-coach-data")
-
 # Creating database connection object - this can later be used to connect
 database_connection = DatabaseConnection()
 
