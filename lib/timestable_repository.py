@@ -18,3 +18,12 @@ class TimestableRepository:
         
         connection.commit()
         cursor.close()
+
+    def update_factors_learned(self, connection, user, timestable, times_learned):
+        cursor = connection.cursor()
+        
+        sql = '''UPDATE timestables SET times_learned = %s WHERE user_id = %s AND name = %s'''
+        cursor.execute(sql, (times_learned, user.id, timestable.name))
+
+        connection.commit()
+        cursor.close()

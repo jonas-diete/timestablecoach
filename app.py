@@ -141,24 +141,10 @@ def register():
         # updating the user object with the correct ids generated from the database
         user = user_repository.create(connection, user)
 
-        # printing the user to check what's saved
-        print(f'ID: {user.id}')
-        print(f'Username: {user.username}')
-        print(f'Password: {user.password}')
-        for timestable in user.timestables:
-            print(f'Timestable ID: {user.timestables[timestable].id}')
-            print(f'Timestable name: {user.timestables[timestable].name}')
-            print(f'Timestable gold: {user.timestables[timestable].gold}')
-            print(f'Timestable silver: {user.timestables[timestable].silver}')
-            print(f'Timestable bronze: {user.timestables[timestable].bronze}')
-            for factor_learned in user.timestables[timestable].factors_learned:
-                print(f'Factor Learned factor: {user.timestables[timestable].factors_learned[factor_learned].factor}')
-                print(f'Factor Learned times_learned: {user.timestables[timestable].factors_learned[factor_learned].times_learned}')
-
         # closing database connection
         connection.close()
 
-        # Logging in
+        # Logging in the newly registered user
         session["username"] = new_username
         return redirect("/select")
     
@@ -237,55 +223,31 @@ def practise(tt):
     if not "username" in session:
         return redirect("/login")
     else:
+        timestable = convert_number_to_timestable(tt)
+
         if request.method == "GET":
             learningdata = ""
-            timestable = convert_number_to_timestable(tt)
             for i in user.timestables[timestable].factors_learned:
-                print('The factor is: ' + str(user.timestables[timestable].factors_learned[i].factor))
-                print('And it has been learned ' + str(user.timestables[timestable].factors_learned[i].times_learned) + ' times.')
                 learningdata += str(user.timestables[timestable].factors_learned[i].times_learned)
 
-            # OLD CODE - DELETE LATER
-            #
-            # # Getting the data about which facts have been learned from the selected timestable
-            # learningdata = ""
-            # x = 0
-            # file = repository.get_contents("learning.txt")
-            # for row in file.decoded_content.decode().split("\n"):
-            #     if row:
-            #         # Finding correct timestable row
-            #         if x == int(tt):
-            #             for item in row:
-            #                 learningdata += item
-            #             break
-            #         else:
-            #             if x > 0:
-            #                 x += 1
-            #         # Finding correct user
-            #         if row == session["username"]:
-            #             x = 2
-                        
             # Sending the learning data to be used in practise.html
             return render_template("practise.html", timestable = int(tt), username = session["username"], numbers = range(1,13), learningdata = learningdata)
         
-        elif request.method == 'POST':
+        elif request.method == 'POST': # gets called when a learning cycle is finished
+
+            # getting learning data from website
             learningdata_updated = request.form.get("learningdata_updated")
+            times_learned = []
+            # global user
+            for i in range(12):
+                # creating list that can be saved in SQL database
+                times_learned.append(int(learningdata_updated[i]))
+                # saving the newly learned factors in user object
+                user.timestables[timestable].factors_learned[i + 1].times_learned = learningdata_updated[i]
             
-            updated_file = ""
-            learning_information = []
-            # Getting current learning information from github
-            file = repository.get_contents("learning.txt")
-            for row in file.decoded_content.decode().split("\n"):
-                learning_information.append(row)
-
-            for i in range(len(learning_information)):
-                if learning_information[i] == session["username"]:
-                    learning_information[i + int(tt) - 1] = learningdata_updated
-
-            for item in learning_information:
-                updated_file += item + "\n"
-
-            repository.update_file(file.path, "Overwriting learning.txt", updated_file, file.sha)
+            # updating times_learned in database
+            timestable_repo = TimestableRepository()
+            timestable_repo.update_factors_learned(database_connection.connect(), user, user.timestables[timestable], times_learned)
         
             return redirect("/select") 
 
