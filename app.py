@@ -3,6 +3,7 @@ from github import Github
 from decouple import config
 from database.database_connection import DatabaseConnection
 from lib.user_repository import UserRepository
+from lib.timestable_repository import TimestableRepository
 from lib.user import User
 from lib.timestable import Timestable
 from lib.factor_learned import FactorLearned
@@ -232,9 +233,8 @@ def test(tt):
             elif medal_earned == '1':
                 user.timestables[timestable].bronze = True
 
-
-            # Todo:
-            # Save new medal updates in database
+            timestable_repo = TimestableRepository()
+            timestable_repo.update_medal(database_connection.connect(), user, user.timestables[timestable])
 
 
             # OLD CODE DELETE LATER

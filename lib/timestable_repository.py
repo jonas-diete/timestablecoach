@@ -1,0 +1,23 @@
+from lib.user import User
+from lib.timestable import Timestable
+from lib.factor_learned import FactorLearned
+
+class TimestableRepository:
+    # the timestable object that's passed in here should have the new medal already saved
+    def update_medal(self, connection, user, timestable):
+        cursor = connection.cursor()
+        # sql = '''SELECT id FROM users WHERE username = %s'''
+        # cursor.execute(sql, (user.username,))
+        # user_id = cursor.fetchone()[0]
+        if timestable.gold == True:
+            sql = '''UPDATE timestables SET gold = true WHERE user_id = %s AND name = %s'''
+        elif timestable.silver == True:
+            sql = '''UPDATE timestables SET silver = true WHERE user_id = %s AND name = %s'''
+        elif timestable.bronze == True:
+            sql = '''UPDATE timestables SET bronze = true WHERE user_id = %s AND name = %s'''
+        cursor.execute(sql, (user.id, timestable.name))
+        
+        print('works')
+
+        connection.commit()
+        cursor.close()
