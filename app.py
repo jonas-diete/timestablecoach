@@ -222,10 +222,8 @@ def test(tt):
             # converting the tt, which is an int, into a timestable name to use within our user object
             converter = {'2':'twos', '3':'threes', '4':'fours', '5':'fives', '6':'sixes', '7':'sevens', '8':'eights', '9':'nines', '10':'tens', '11':'elevens', '12':'twelves'}
             timestable = converter[tt]
-            print('Current timestable: ' + timestable)
             # Receiving which medal was won, when timestable test was completed
             medal_earned = request.form.get("medal_earned")
-            print('Medal earned: ' + medal_earned)
             global user
             if medal_earned == '3':
                 user.timestables[timestable].gold = True
@@ -233,26 +231,6 @@ def test(tt):
                 user.timestables[timestable].silver = True
             elif medal_earned == '1':
                 user.timestables[timestable].bronze = True
-            print('Twos timestable bronze: ')
-            print(user.timestables[timestable].bronze)
-            print('Twos timestable silver: ')
-            print(user.timestables[timestable].silver)
-            print('Twos timestable gold: ')
-            print(user.timestables[timestable].gold)
-
-            # # printing the user to check what's saved
-            # print(f'ID: {user.id}')
-            # print(f'Username: {user.username}')
-            # print(f'Password: {user.password}')
-            # for timestable in user.timestables:
-            #     print(f'Timestable ID: {user.timestables[timestable].id}')
-            #     print(f'Timestable name: {user.timestables[timestable].name}')
-            #     print(f'Timestable gold: {user.timestables[timestable].gold}')
-            #     print(f'Timestable silver: {user.timestables[timestable].silver}')
-            #     print(f'Timestable bronze: {user.timestables[timestable].bronze}')
-            #     for factor_learned in user.timestables[timestable].factors_learned:
-            #         print(f'Factor Learned factor: {user.timestables[timestable].factors_learned[factor_learned].factor}')
-            #         print(f'Factor Learned times_learned: {user.timestables[timestable].factors_learned[factor_learned].times_learned}')
 
 
             # Todo:
