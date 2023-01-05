@@ -1,5 +1,4 @@
 from flask import Flask, redirect, render_template, request, session
-from github import Github
 from decouple import config
 from database.database_connection import DatabaseConnection
 from lib.user_repository import UserRepository
