@@ -10,8 +10,11 @@ Here is a video where I am introducing the app:
 [![some text](./static/images/video_screenshot.png)](https://youtu.be/Sw7LIZK6b_Y)
 
 
-### Work in Progress
+### Development
 
-It's my personal project and I am continuously working to improve it.   
-I am in the process of setting up SQL database to save the user data - instead of writing it on txt files, as done currently.
+09/01/2023 - I have spent the last couple of weeks setting up a PostgreSQL database and linked it with the project. Now all the user data, information about medals and which timestables have been learned are saved securely via bit.io.  
+
+Here is an overview on how the data is saved in the SQL database and how it is accessed by the app.
+![database overview](./static/images/ttocach_database.png)
+
 
