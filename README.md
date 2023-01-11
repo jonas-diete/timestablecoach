@@ -1,8 +1,19 @@
 # Times Table Coach
 
 This is a web app that teaches children their multiplication tables.
+I developed this app myself in late 2021 and have been revisiting it after finishing my Makers Academy Coding bootcamp.
+I am currently refactoring some functions to improve the code quality
 
-It live available under:
+### Tech Used
+
+- Python
+- Flask
+- PostgreSQL
+- JavaScript
+- HTML
+- CSS
+
+Times Table Coach is live available under:  
 [https://ttcoach.herokuapp.com](ttcoach.herokuapp.com)
 
 Here is a video where I am introducing the app:   
