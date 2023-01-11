@@ -6,12 +6,12 @@ I am currently refactoring some functions to improve the code quality
 
 ### Tech Used
 
-- Python
-- Flask
-- PostgreSQL
-- JavaScript
-- HTML
-- CSS
+- Python - backend
+- Flask - running the server
+- PostgreSQL - database hosted on bit.io
+- JavaScript - interactivity on test and practice screens
+- HTML - web layout
+- CSS - style
 
 Times Table Coach is live available under:  
 [https://ttcoach.herokuapp.com](ttcoach.herokuapp.com)
