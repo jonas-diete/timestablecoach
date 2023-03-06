@@ -15,6 +15,7 @@ Jinja2==3.0.2
 MarkupSafe==2.0.1
 pipreqs==0.4.11
 ply==3.11
+psycopg2==2.9.5
 pycparser==2.21
 PyGithub==1.55
 PyJWT==2.3.0
