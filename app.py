@@ -26,7 +26,7 @@ def convert_number_to_timestable(number):
     converter = {'2':'twos', '3':'threes', '4':'fours', '5':'fives', '6':'sixes', '7':'sevens', '8':'eights', '9':'nines', '10':'tens', '11':'elevens', '12':'twelves'}
     return converter[number]
 
-def check_username_registration(username):
+def check_registration_username(username):
     # Checking if username exists already
     if user_repository.get_one(database_connection.connect(), username) != False:
         return "Username exists already. Try again."
@@ -41,20 +41,8 @@ def check_username_registration(username):
     
     return None
 
-def check_registration_details(username, password1, password2, cookies, terms_and_conditions_agreement):
-    # Checking if cookies have been accepted
-    if cookies == 'no':
-        return "Please accept the cookies."
-    
-    # Checking if terms and conditions have been agreed to
-    if terms_and_conditions_agreement != "agreed":
-        return "Please accept the Terms and Conditions."
-    
-    username_check_message = check_username_registration(username)
-    if username_check_message != None:
-        return username_check_message
-    
-    # Checking if passwords match
+def check_registration_password(password1, password2):
+        # Checking if passwords match
     if password1 != password2:
         return "Passwords don't match. Try again."
     
@@ -65,6 +53,25 @@ def check_registration_details(username, password1, password2, cookies, terms_an
     # Checking new password has at least 4 characters
     if len(password2) < 4:
         return "Password must be at least 4 characters long. Try again."
+
+    return None
+
+def check_registration_details(username, password1, password2, cookies, terms_and_conditions_agreement):
+    # Checking if cookies have been accepted
+    if cookies == 'no':
+        return "Please accept the cookies."
+    
+    # Checking if terms and conditions have been agreed to
+    if terms_and_conditions_agreement != "agreed":
+        return "Please accept the Terms and Conditions."
+    
+    username_check_message = check_registration_username(username)
+    if username_check_message != None:
+        return username_check_message
+    
+    password_check_message = check_registration_password(password1, password2)
+    if password_check_message != None:
+        return password_check_message
 
     return None
 
