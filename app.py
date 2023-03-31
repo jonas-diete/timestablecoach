@@ -26,8 +26,20 @@ def convert_number_to_timestable(number):
     converter = {'2':'twos', '3':'threes', '4':'fours', '5':'fives', '6':'sixes', '7':'sevens', '8':'eights', '9':'nines', '10':'tens', '11':'elevens', '12':'twelves'}
     return converter[number]
 
-def check_username_and_password(username, password1, password2):
-        # Checking if username is alphanumeric
+def check_username_and_password(username, password1, password2, cookies, terms_and_conditions_agreement):
+    # Checking if cookies have been accepted
+    if cookies == 'no':
+        return "Please accept the cookies."
+    
+    # Checking if terms and conditions have been agreed to
+    if terms_and_conditions_agreement != "agreed":
+        return "Please accept the Terms and Conditions."
+    
+    # Checking if username exists already
+    if user_repository.get_one(database_connection.connect(), username) != False:
+        return "Username exists already. Try again."
+    
+    # Checking if username is alphanumeric
     if not username.isalnum():
         return "Only letters or numbers allowed for username. Try again."
     
@@ -101,18 +113,9 @@ def register():
         new_username = request.form.get("username")
         new_pw1 = request.form.get("password1")
         new_pw2 = request.form.get("password2")
+        terms_and_conditions_agreement = request.form.get("agreement")
 
-        if cookies == 'no':
-            return render_template("register.html", register_message = "Please accept the cookies.", cookies = cookies)
-
-        if user_repository.get_one(database_connection.connect(), new_username) != False:
-            return render_template("register.html", register_message = "Username exists already. Try again.", cookies = cookies)
-        
-        # Checking if terms and conditions have been agreed to
-        if request.form.get("agreement") != "agreed":
-            return render_template("register.html", register_message = "Please accept the Terms and Conditions.", cookies = cookies)
-
-        message = check_username_and_password(new_username, new_pw1, new_pw2)
+        message = check_username_and_password(new_username, new_pw1, new_pw2, cookies, terms_and_conditions_agreement)
         if message != None:
             return render_template("register.html", register_message = message, cookies = cookies)
         
