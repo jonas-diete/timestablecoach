@@ -26,6 +26,29 @@ def convert_number_to_timestable(number):
     converter = {'2':'twos', '3':'threes', '4':'fours', '5':'fives', '6':'sixes', '7':'sevens', '8':'eights', '9':'nines', '10':'tens', '11':'elevens', '12':'twelves'}
     return converter[number]
 
+def check_username_and_password(username, password1, password2):
+        # Checking if username is alphanumeric
+    if not username.isalnum():
+        return "Only letters or numbers allowed for username. Try again."
+    
+    # Checking if username has at least 2 characters
+    if len(username) < 2:
+        return "Please enter a longer username."
+
+    # Checking if passwords match
+    if password1 != password2:
+        return "Passwords don't match. Try again."
+    
+    # Checking there are no spaces in password
+    if " " in password1:
+        return "No spaces allowed in password. Try again."
+    
+    # Checking new password has at least 4 characters
+    if len(password2) < 4:
+        return "Password must be at least 4 characters long. Try again."
+
+    return None
+
 @app.route("/")
 def index():
     return redirect("/login")
@@ -89,25 +112,9 @@ def register():
         if request.form.get("agreement") != "agreed":
             return render_template("register.html", register_message = "Please accept the Terms and Conditions.", cookies = cookies)
 
-        # Checking if username is alphanumeric
-        if not new_username.isalnum():
-            return render_template("register.html", register_message = "Only letters or numbers allowed for username. Try again.", cookies = cookies)
-        
-        # Checking if username has at least 2 characters
-        if len(new_username) < 2:
-            return render_template("register.html", register_message = "Please enter a longer username.", cookies = cookies)
-
-        # Checking if passwords match
-        if new_pw1 != new_pw2:
-            return render_template("register.html", register_message = "Passwords don't match. Try again.", cookies = cookies)
-        
-        # Checking there are no spaces in password
-        if " " in new_pw1:
-            return render_template("register.html", register_message = "No spaces allowed in password. Try again.", cookies = cookies)
-        
-        # Checking new password has at least 4 characters
-        if len(new_pw1) < 4:
-            return render_template("register.html", register_message = "Password must be at least 4 characters long. Try again.", cookies = cookies)
+        message = check_username_and_password(new_username, new_pw1, new_pw2)
+        if message != None:
+            return render_template("register.html", register_message = message, cookies = cookies)
         
         # REGISTERING NEW USER
         # encrypting password
