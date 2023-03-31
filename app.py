@@ -66,11 +66,11 @@ def check_registration_details(username, password1, password2, cookies, terms_an
         return "Please accept the Terms and Conditions."
     
     username_check_message = check_registration_username(username)
-    if username_check_message != None:
+    if username_check_message:
         return username_check_message
     
     password_check_message = check_registration_password(password1, password2)
-    if password_check_message != None:
+    if password_check_message:
         return password_check_message
 
     return None
@@ -130,7 +130,7 @@ def register():
         terms_and_conditions_agreement = request.form.get("agreement")
 
         message = check_registration_details(new_username, new_pw1, new_pw2, cookies, terms_and_conditions_agreement)
-        if message != None:
+        if message:
             return render_template("register.html", register_message = message, cookies = cookies)
         
         # REGISTERING NEW USER
