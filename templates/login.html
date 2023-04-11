@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 
 {% block head %}
+    <script type="text/javascript" src="/static/cookieCheck.js"></script>
     <script>
         const togglePasswordVisibility = () => {
             let eye = document.getElementById('show-hide-password');
@@ -17,26 +18,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             
-            // if cookies had already been accepted before
-            if ('{{cookies}}' == 'yes') {
-                // Hiding cookie notification
-                document.getElementById('cookie_consent').style.display='none';
-                
-            } else {
-                document.getElementById('accept_button').addEventListener('click', () => {
-                
-                    // Hiding cookie notification
-                    document.getElementById('cookie_consent').style.display='none';
-
-                    // Sending data that cookies have been accepted
-                    var data = new FormData();
-                    data.append('accepted', 'yes');
-                    var request = new XMLHttpRequest();
-                    request.open('POST', '/login');
-                    request.send(data);
-                })
-            }
-
+            cookieCheck('{{cookies}}');
             document.getElementById('show-hide-password').addEventListener('click', togglePasswordVisibility);
         })
     </script>
