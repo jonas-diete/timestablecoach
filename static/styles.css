@@ -169,9 +169,14 @@ input[type=text]:focus, input[type=password]:focus {
 #show-hide-password {
     height: 30px;
     width: 30px;
-    padding: 0 0 0 7px;
+    margin: 0 0 0 7px;
     position: relative;
     top: 5px;
+}
+
+#show-hide-password:hover {
+    background-color: #3a3a3a;
+    border-radius: 50%;
 }
 
 #cookie_consent {
