@@ -2,20 +2,8 @@
 
 {% block head %}
     <script type="text/javascript" src="/static/cookieCheck.js"></script>
+    <script type="text/javascript" src="/static/togglePasswordVisibility.js"></script>
     <script>
-        const togglePasswordVisibility = () => {
-            let eye = document.getElementById('show-hide-password');
-            let passwordInput = document.getElementById('password');
-
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eye.src = '/static/images/eye.png'
-            } else {
-                passwordInput.type = 'password';
-                eye.src = '/static/images/eye-crossed-out.png'
-            }
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
             
             cookieCheck('{{cookies}}');
