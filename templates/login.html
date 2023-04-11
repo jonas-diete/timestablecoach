@@ -15,15 +15,15 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', () => {
             
             // if cookies had already been accepted before
-            if (document.getElementById('cookies_accepted').innerHTML == "yes") {
-                
+            if ('{{cookies}}' == 'yes') {
                 // Hiding cookie notification
                 document.getElementById('cookie_consent').style.display='none';
+                
             } else {
-                document.getElementById('accept_button').addEventListener('click', function() {
+                document.getElementById('accept_button').addEventListener('click', () => {
                 
                     // Hiding cookie notification
                     document.getElementById('cookie_consent').style.display='none';
@@ -50,8 +50,7 @@
     </div>
 
     <div id="cookie_consent"> 
-        <span>
-            <span id="cookies_accepted">{{cookies}}</span> 
+        <span> 
             This site uses only essential cookies, which enable you to stay logged in across the next few pages. 
             <br>
             If you don't wish to use cookies, please leave this page now.
