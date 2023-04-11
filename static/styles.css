@@ -151,6 +151,29 @@ input[type=text]:focus, input[type=password]:focus {
 
 /* ------------- LOGIN SCREEN -------------- */
 
+#password-container {
+    width: 307px;
+    margin: 8px auto;
+}
+
+#password {
+    margin: 0;
+    width: 215px;
+}
+
+#username {
+    width: 215px;
+    margin: 12px 40px 12px 0;
+}
+
+#show-hide-password {
+    height: 30px;
+    width: 30px;
+    padding: 0 0 0 7px;
+    position: relative;
+    top: 5px;
+}
+
 #cookie_consent {
     position: fixed;
     bottom: 10px;

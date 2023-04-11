@@ -50,9 +50,12 @@
 
     <div class="narrow_row"> 
         <form action="/login" method="POST">
-            <input autofocus autocomplete="off" type="text" name="username" placeholder="Username">
+            <input id="username" autofocus autocomplete="off" type="text" name="username" placeholder="Username">
             <br>
-            <input autocomplete="off" type="password" name="password" placeholder="Password">
+            <div id="password-container">
+                <input id="password" autocomplete="off" type="password" name="password" placeholder="Password">
+                <img src="/static/images/eye.png" id="show-hide-password">
+            </div>
             <br>
             <button type="submit" class="select_button" id="login_button">Login</button>
         </form>
