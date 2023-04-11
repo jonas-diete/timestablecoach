@@ -2,6 +2,19 @@
 
 {% block head %}
     <script>
+        const togglePasswordVisibility = () => {
+            let eye = document.getElementById('show-hide-password');
+            let passwordInput = document.getElementById('password');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eye.src = '/static/images/eye.png'
+            } else {
+                passwordInput.type = 'password';
+                eye.src = '/static/images/eye-crossed-out.png'
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             
             // if cookies had already been accepted before
@@ -9,8 +22,7 @@
                 
                 // Hiding cookie notification
                 document.getElementById('cookie_consent').style.display='none';
-            }
-            else {
+            } else {
                 document.getElementById('accept_button').addEventListener('click', function() {
                 
                     // Hiding cookie notification
@@ -24,7 +36,8 @@
                     request.send(data);
                 })
             }
-            
+
+            document.getElementById('show-hide-password').addEventListener('click', togglePasswordVisibility);
         })
     </script>
 {% endblock %}
@@ -54,7 +67,7 @@
             <br>
             <div id="password-container">
                 <input id="password" autocomplete="off" type="password" name="password" placeholder="Password">
-                <img src="/static/images/eye.png" id="show-hide-password">
+                <img src="/static/images/eye-crossed-out.png" id="show-hide-password">
             </div>
             <br>
             <button type="submit" class="select_button" id="login_button">Login</button>
