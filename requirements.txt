@@ -5,6 +5,7 @@ Flask==2.2.3
 gunicorn==20.1.0
 itsdangerous==2.1.2
 Jinja2==3.1.2
+jsonpickle==3.0.1
 MarkupSafe==2.1.2
 psycopg2==2.9.5
 python-decouple==3.8
