@@ -7,6 +7,7 @@ from lib.user import User
 from lib.timestable import Timestable
 from lib.factor_learned import FactorLearned
 import bcrypt
+import jsonpickle
 app = Flask(__name__)
 
 # getting key for signing the cookies from .env file
@@ -19,7 +20,7 @@ database_connection = DatabaseConnection()
 user_repository = UserRepository()
 
 # defining global user variable, that stores all the user data
-user = False
+# user = False
 
 # converts the tt, which is an int written in the url, into a timestable name to use within our user object
 def convert_number_to_timestable(number):
@@ -94,19 +95,19 @@ def login():
         password_entered = request.form.get("password")
 
         # checking if user exists and password is correct
-        global user
-        user = user_repository.get_one(database_connection.connect(), username_entered) 
-        if user == False or not bcrypt.checkpw(password_entered.encode('utf-8'), user.password.encode('utf-8')):
+        # TEST IT!
+        user_retrieved = user_repository.get_one(database_connection.connect(), username_entered) 
+        if user_retrieved == False or not bcrypt.checkpw(password_entered.encode('utf-8'), user_retrieved.password.encode('utf-8')):
             return render_template("login.html", login_message = "Incorrect username or password. Try again.", cookies = "yes")
         
         # logging in
-        session["username"] = user.username
+        session["user"] = jsonpickle.encode(user_retrieved)
         return redirect("/select")
     
     elif request.method == 'GET':   
-        # deleting username in case we were redirected here after logout
-        if "username" in session:
-            session.pop("username", default=None) 
+        # deleting user in case we were redirected here after logout
+        if "user" in session:
+            session.pop("user", default=None) 
 
         # checking if user has accepted cookies
         if "cookies" in session:
@@ -150,18 +151,17 @@ def register():
             for i in range(1, 13):
                 factors_learned[i] = FactorLearned(i)
             timestables[name] = Timestable(name, factors_learned)
-        global user
-        user = User(new_username, hashed_password.decode(encoding='UTF-8'), timestables)
+
+        # creating new user
+        session["user"] = jsonpickle.encode(User(new_username, hashed_password.decode(encoding='UTF-8'), timestables))
 
         # saving new user in database and
         # updating the user object with the correct ids generated from the database
-        user = user_repository.create(connection, user)
+        session["user"] = jsonpickle.encode(user_repository.create(connection, jsonpickle.decode(session["user"])))
 
         # closing database connection
         connection.close()
 
-        # Logging in the newly registered user
-        session["username"] = new_username
         return redirect("/select")
     
     elif request.method == 'GET':
@@ -173,8 +173,7 @@ def terms():
 
 @app.route("/select", methods=["GET", "POST"])
 def select():
-    global user
-    if not "username" in session or user == False:
+    if not "user" in session or session["user"] == False:
         return redirect("/login")
     else:
         if request.method == "POST":
@@ -196,6 +195,8 @@ def select():
             timestables_names = ['twos', 'threes', 'fours', 'fives', 'sixes', 'sevens', 'eights', 'nines', 'tens', 'elevens', 'twelves']
             user_medals_str = ""
             for timestable_name in timestables_names:
+                # REFACTOR HERE!
+                user = jsonpickle.decode(session["user"])
                 if user.timestables[timestable_name].gold == True:
                     user_medals_str += '3'
                 elif user.timestables[timestable_name].silver == True:
@@ -206,20 +207,20 @@ def select():
                     user_medals_str += '0'
 
             # Loading page
-            return render_template("select.html", username = session["username"], tts = range(3, 13), medals = user_medals_str)                
+            return render_template("select.html", username = user.username, tts = range(3, 13), medals = user_medals_str)                
 
 @app.route("/test/<tt>", methods=["GET", "POST"])
 def test(tt):
-    if not "username" in session:
+    if not "user" in session:
         return redirect("/login")
     else:
+        user = jsonpickle.decode(session["user"])
         if request.method == "GET":
-            return render_template("test.html", timestable = tt, username = session["username"])
+            return render_template("test.html", timestable = tt, username = user.username)
         elif request.method == 'POST':
             timestable = convert_number_to_timestable(tt)
             # Receiving which medal was won, when timestable test was completed
             medal_earned = request.form.get("medal_earned")
-            global user
             if medal_earned == '3':
                 user.timestables[timestable].gold = True
             elif medal_earned == '2':
@@ -227,6 +228,9 @@ def test(tt):
             elif medal_earned == '1':
                 user.timestables[timestable].bronze = True
 
+            # updating user in session cookie
+            session["user"] = jsonpickle.encode(user)
+            
             # updating medal in database
             timestable_repo = TimestableRepository()
             timestable_repo.update_medal(database_connection.connect(), user, user.timestables[timestable])
@@ -236,9 +240,10 @@ def test(tt):
 
 @app.route("/practise/<tt>", methods=["GET", "POST"])
 def practise(tt):
-    if not "username" in session:
+    if not "user" in session:
         return redirect("/login")
     else:
+        user = jsonpickle.decode(session["user"])
         timestable = convert_number_to_timestable(tt)
 
         if request.method == "GET":
@@ -261,6 +266,9 @@ def practise(tt):
                 # saving the newly learned factors in user object
                 user.timestables[timestable].factors_learned[i + 1].times_learned = learningdata_updated[i]
             
+            # updating user in session cookie
+            session["user"] = jsonpickle.encode(user)
+
             # updating times_learned in database
             timestable_repo = TimestableRepository()
             timestable_repo.update_factors_learned(database_connection.connect(), user, user.timestables[timestable], times_learned)
