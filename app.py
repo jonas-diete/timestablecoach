@@ -153,11 +153,11 @@ def register():
             timestables[name] = Timestable(name, factors_learned)
 
         # creating new user
-        session["user"] = jsonpickle.encode(User(new_username, hashed_password.decode(encoding='UTF-8'), timestables))
+        new_user = User(new_username, hashed_password.decode(encoding='UTF-8'), timestables)
 
         # saving new user in database and
         # updating the user object with the correct ids generated from the database
-        session["user"] = jsonpickle.encode(user_repository.create(connection, jsonpickle.decode(session["user"])))
+        session["user"] = jsonpickle.encode(user_repository.create(connection, new_user))
 
         # closing database connection
         connection.close()
@@ -195,7 +195,6 @@ def select():
             timestables_names = ['twos', 'threes', 'fours', 'fives', 'sixes', 'sevens', 'eights', 'nines', 'tens', 'elevens', 'twelves']
             user_medals_str = ""
             for timestable_name in timestables_names:
-                # REFACTOR HERE!
                 user = jsonpickle.decode(session["user"])
                 if user.timestables[timestable_name].gold == True:
                     user_medals_str += '3'
@@ -230,7 +229,7 @@ def test(tt):
 
             # updating user in session cookie
             session["user"] = jsonpickle.encode(user)
-            
+
             # updating medal in database
             timestable_repo = TimestableRepository()
             timestable_repo.update_medal(database_connection.connect(), user, user.timestables[timestable])
