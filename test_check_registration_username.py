@@ -31,3 +31,6 @@ def test_usernames_with_special_chars_return_correct_error_message():
     assert check_registration_username("Rich13(ruler)") == message
     assert check_registration_username("Lisa,Frank") == message
     assert check_registration_username("<script>something</script>") == message
+    assert check_registration_username("Testing Space") == message
+    assert check_registration_username(" spacetester  ") == message
+    assert check_registration_username("") == message
