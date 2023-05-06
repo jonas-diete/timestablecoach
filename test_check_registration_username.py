@@ -17,6 +17,12 @@ def test_too_short_usernames_return_correct_error_message():
     assert check_registration_username("9") == message
     assert check_registration_username("0") == message
 
+def test_too_long_usernames_return_correct_error_message():
+    message = "Please enter a shorter username."
+    assert check_registration_username("MarielouiseSmith") == message
+    assert check_registration_username("0123456789012345") == message
+    assert check_registration_username("WhatA5illyNam3Th1s1s") == message
+
 def test_usernames_with_special_chars_return_correct_error_message():
     message = "Only letters or numbers allowed for username. Try again."
     assert check_registration_username("James!") == message
