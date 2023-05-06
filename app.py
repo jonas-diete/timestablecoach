@@ -25,7 +25,10 @@ user_repository = UserRepository()
 # converts the tt, which is an int written in the url, into a timestable name to use within our user object
 def convert_number_to_timestable(number):
     converter = {'2':'twos', '3':'threes', '4':'fours', '5':'fives', '6':'sixes', '7':'sevens', '8':'eights', '9':'nines', '10':'tens', '11':'elevens', '12':'twelves'}
-    return converter[number]
+    try: 
+        return converter[number]
+    except KeyError:
+        return None
 
 def check_registration_username(username):
     # Checking if username exists already
