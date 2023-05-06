@@ -31,10 +31,6 @@ def convert_number_to_timestable(number):
         return None
 
 def check_registration_username(username):
-    # Checking if username exists already
-    if user_repository.get_one(database_connection.connect(), username) != False:
-        return "Username exists already. Try again."
-    
     # Checking if username is alphanumeric
     if not username.isalnum():
         return "Only letters or numbers allowed for username. Try again."
@@ -43,6 +39,11 @@ def check_registration_username(username):
     if len(username) < 2:
         return "Please enter a longer username."
     
+    # Checking if username exists already
+    if user_repository.get_one(database_connection.connect(), username) != False:
+        return "Username exists already. Try again."
+    
+    # returns none if a username is valid
     return None
 
 def check_registration_password(password1, password2):
