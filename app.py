@@ -87,7 +87,7 @@ def login():
             session["cookies"] = "yes"
 
         # checking if cookies are accepted
-        if not 'cookies' in session:
+        if not "cookies" in session:
             return render_template("login.html", login_message = "You must accept the cookies to continue.", cookies = "")
         
         # saving user input
@@ -95,7 +95,6 @@ def login():
         password_entered = request.form.get("password")
 
         # checking if user exists and password is correct
-        # TEST IT!
         user_retrieved = user_repository.get_one(database_connection.connect(), username_entered) 
         if user_retrieved == False or not bcrypt.checkpw(password_entered.encode('utf-8'), user_retrieved.password.encode('utf-8')):
             return render_template("login.html", login_message = "Incorrect username or password. Try again.", cookies = "yes")
