@@ -10,9 +10,18 @@ def test_valid_usernames_return_none():
     assert check_registration_username("Little13Mice") == None
     assert check_registration_username("Pi") == None
 
-def test_too_short_usernames_return_correct_message():
+def test_too_short_usernames_return_correct_error_message():
     message = "Please enter a longer username."
     assert check_registration_username("L") == message
     assert check_registration_username("a") == message
     assert check_registration_username("9") == message
     assert check_registration_username("0") == message
+
+def test_usernames_with_special_chars_return_correct_error_message():
+    message = "Only letters or numbers allowed for username. Try again."
+    assert check_registration_username("James!") == message
+    assert check_registration_username("-Julie-") == message
+    assert check_registration_username("Bad_Actor") == message
+    assert check_registration_username("Rich13(ruler)") == message
+    assert check_registration_username("Lisa,Frank") == message
+    assert check_registration_username("<script>something</script>") == message
