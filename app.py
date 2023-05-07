@@ -51,7 +51,7 @@ def check_registration_username(username):
     return None
 
 def check_registration_password(password1, password2):
-        # Checking if passwords match
+    # Checking if passwords match
     if password1 != password2:
         return "Passwords don't match. Try again."
     
@@ -63,6 +63,11 @@ def check_registration_password(password1, password2):
     if len(password2) < 4:
         return "Password must be at least 4 characters long. Try again."
 
+    # Checking new password has 20 character max
+    if len(password2) > 20:
+        return "Password cannot be longer than 20 characters. Try again."
+    
+    # returns none if password is valid
     return None
 
 def check_registration_details(username, password1, password2, cookies, terms_and_conditions_agreement):

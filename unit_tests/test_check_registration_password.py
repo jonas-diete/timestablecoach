@@ -20,3 +20,8 @@ def test_password_at_least_4_chars():
     assert check_registration_password("", "") == message
     assert check_registration_password("pas", "pas") == message
     assert check_registration_password("1", "1") == message
+
+def test_password_max_20_chars():
+    message = "Password cannot be longer than 20 characters. Try again."
+    assert check_registration_password("012345678901234567890", "012345678901234567890") == message
+    assert check_registration_password("ThisIsMySuper333LongMegaPassword", "ThisIsMySuper333LongMegaPassword") == message
