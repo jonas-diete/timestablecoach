@@ -14,14 +14,22 @@ def test_spaces_in_password_return_correct_error_message():
     assert check_registration_password("  Password", "  Password") == message
     assert check_registration_password("pass word ", "pass word ") == message
 
-def test_password_at_least_4_chars():
+def test_too_short_passwords_return_correct_error_message():
     message = "Password must be at least 4 characters long. Try again."
     assert check_registration_password("hi", "hi") == message
     assert check_registration_password("", "") == message
     assert check_registration_password("pas", "pas") == message
     assert check_registration_password("1", "1") == message
 
-def test_password_max_20_chars():
+def test_too_long_passwords_return_correct_error_message():
     message = "Password cannot be longer than 20 characters. Try again."
     assert check_registration_password("012345678901234567890", "012345678901234567890") == message
     assert check_registration_password("ThisIsMySuper333LongMegaPassword", "ThisIsMySuper333LongMegaPassword") == message
+
+def test_valid_passwords_return_none():
+    assert check_registration_password("AVALIDPASSWORD", "AVALIDPASSWORD") == None
+    assert check_registration_password("avalidpassword", "avalidpassword") == None
+    assert check_registration_password("aValidPassword", "aValidPassword") == None
+    assert check_registration_password("!a<>valid()pas$word%", "!a<>valid()pas$word%") == None
+    assert check_registration_password("1234", "1234") == None
+    assert check_registration_password("my_n3w_pa55w0rd", "my_n3w_pa55w0rd") == None
