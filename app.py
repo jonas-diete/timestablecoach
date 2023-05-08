@@ -91,13 +91,13 @@ def check_registration_details(username, password1, password2, cookies, terms_an
     if terms_and_conditions_agreement != "agreed":
         return "Please accept the Terms and Conditions."
     
-    username_check_message = check_registration_username(username)
-    if username_check_message:
-        return username_check_message
+    username_error_message = check_registration_username(username)
+    if username_error_message:
+        return username_error_message
     
-    password_check_message = check_registration_password(password1, password2)
-    if password_check_message:
-        return password_check_message
+    password_error_message = check_registration_password(password1, password2)
+    if password_error_message:
+        return password_error_message
 
     return None
 
@@ -118,16 +118,21 @@ def login():
         # saving user input
         username_entered = request.form.get("username")
         password_entered = request.form.get("password")
-
-        # checking if user exists and password is correct
-        user_retrieved = user_repository.get_one(database_connection.connect(), username_entered) 
-        if user_retrieved == False or not bcrypt.checkpw(password_entered.encode('utf-8'), user_retrieved.password.encode('utf-8')):
-            return render_template("login.html", login_message = "Incorrect username or password. Try again.", cookies = "yes")
+        # checking for error message on username and password
+        # this ensures no special characters etc are used to hack database
+        if check_username(username_entered) == None and check_password(password_entered) == None:
+            # trying to load user from database
+            user_retrieved = user_repository.get_one(database_connection.connect(), username_entered) 
+            # checking user exists and password matches database
+            if user_retrieved and bcrypt.checkpw(password_entered.encode('utf-8'), user_retrieved.password.encode('utf-8')):
+                # everything is correct - logging in
+                session["user"] = jsonpickle.encode(user_retrieved)
+                return redirect("/select")
         
-        # logging in
-        session["user"] = jsonpickle.encode(user_retrieved)
-        return redirect("/select")
-    
+        # username didn't exist or password was wrong
+        return render_template("login.html", login_message = "Incorrect username or password. Try again.", cookies = "yes")
+        
+        
     elif request.method == 'GET':   
         # deleting user in case we were redirected here after logout
         if "user" in session:
@@ -154,9 +159,9 @@ def register():
         new_pw2 = request.form.get("password2")
         terms_and_conditions_agreement = request.form.get("agreement")
 
-        message = check_registration_details(new_username, new_pw1, new_pw2, cookies, terms_and_conditions_agreement)
-        if message:
-            return render_template("register.html", register_message = message, cookies = cookies)
+        error_message = check_registration_details(new_username, new_pw1, new_pw2, cookies, terms_and_conditions_agreement)
+        if error_message:
+            return render_template("register.html", register_message = error_message, cookies = cookies)
         
         # REGISTERING NEW USER
         # encrypting password
