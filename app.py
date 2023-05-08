@@ -31,6 +31,26 @@ def convert_number_to_timestable(number):
         return None
 
 def check_registration_username(username):
+    message = check_username(username)
+    if message:
+        return message
+    else:
+        # Checking if username exists already
+        if user_repository.get_one(database_connection.connect(), username) != False:
+            return "Username exists already. Try again."
+    
+    # returns none if a username is valid
+    return None
+
+def check_registration_password(password1, password2):
+    # Checking if passwords match
+    if password1 != password2:
+        return "Passwords don't match. Try again."
+    
+    # Checking other requirements on characters and length
+    return check_password(password1)
+
+def check_username(username):
     # Checking if username is alphanumeric
     if not username.isalnum():
         return "Only letters or numbers allowed for username. Try again."
@@ -42,29 +62,21 @@ def check_registration_username(username):
     # Checking if username has at most 15 characters
     if len(username) > 15:
         return "Please enter a shorter username."
-    
-    # Checking if username exists already
-    if user_repository.get_one(database_connection.connect(), username) != False:
-        return "Username exists already. Try again."
-    
-    # returns none if a username is valid
+
+    # returns none if username is valid
     return None
 
-def check_registration_password(password1, password2):
-    # Checking if passwords match
-    if password1 != password2:
-        return "Passwords don't match. Try again."
-    
+def check_password(password):
     # Checking there are no spaces in password
-    if " " in password1:
+    if " " in password:
         return "No spaces allowed in password. Try again."
     
     # Checking new password has at least 4 characters
-    if len(password2) < 4:
+    if len(password) < 4:
         return "Password must be at least 4 characters long. Try again."
 
     # Checking new password has 20 character max
-    if len(password2) > 20:
+    if len(password) > 20:
         return "Password cannot be longer than 20 characters. Try again."
     
     # returns none if password is valid
