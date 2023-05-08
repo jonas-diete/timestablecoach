@@ -39,16 +39,8 @@ def check_registration_username(username):
         if user_repository.get_one(database_connection.connect(), username) != False:
             return "Username exists already. Try again."
     
-    # returns none if a username is valid
+    # username is valid - returning no errors
     return None
-
-def check_registration_password(password1, password2):
-    # Checking if passwords match
-    if password1 != password2:
-        return "Passwords don't match. Try again."
-    
-    # Checking other requirements on characters and length
-    return check_password(password1)
 
 def check_username(username):
     # Checking if username is alphanumeric
@@ -63,8 +55,16 @@ def check_username(username):
     if len(username) > 15:
         return "Please enter a shorter username."
 
-    # returns none if username is valid
+    # username is valid - returning no errors
     return None
+
+def check_registration_password(password1, password2):
+    # Checking if passwords match
+    if password1 != password2:
+        return "Passwords don't match. Try again."
+    
+    # Checking other requirements on characters and length
+    return check_password(password1)
 
 def check_password(password):
     # Checking there are no spaces in password
@@ -79,7 +79,7 @@ def check_password(password):
     if len(password) > 20:
         return "Password cannot be longer than 20 characters. Try again."
     
-    # returns none if password is valid
+    # password is valid - returning no errors
     return None
 
 def check_registration_details(username, password1, password2, cookies, terms_and_conditions_agreement):
@@ -99,6 +99,7 @@ def check_registration_details(username, password1, password2, cookies, terms_an
     if password_error_message:
         return password_error_message
 
+    # no errors returned
     return None
 
 @app.route("/")
@@ -129,7 +130,7 @@ def login():
             # checking user exists and password matches database
             if user_retrieved and bcrypt.checkpw(password_entered.encode('utf-8'), user_retrieved.password.encode('utf-8')):
                 
-                # everything is correct - logging in
+                # logging in
                 session["user"] = jsonpickle.encode(user_retrieved)
                 return redirect("/select")
         
