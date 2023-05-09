@@ -26,10 +26,16 @@ def test_too_long_passwords_return_correct_error_message():
     assert check_registration_password("012345678901234567890", "012345678901234567890") == message
     assert check_registration_password("ThisIsMySuper333LongMegaPassword", "ThisIsMySuper333LongMegaPassword") == message
 
+def test_certain_special_characters_return_correct_error_message():
+    message = "Password cannot contain any of these characters: <>();"
+    assert check_registration_password("<script>hi</script>", "<script>hi</script>") == message
+    assert check_registration_password("alert('Boo')", "alert('Boo')") == message
+    assert check_registration_password("Not;allowed", "Not;allowed") == message
+
 def test_valid_passwords_return_none():
     assert check_registration_password("AVALIDPASSWORD", "AVALIDPASSWORD") == None
     assert check_registration_password("avalidpassword", "avalidpassword") == None
     assert check_registration_password("aValidPassword", "aValidPassword") == None
-    assert check_registration_password("!a<>valid()pas$word%", "!a<>valid()pas$word%") == None
+    assert check_registration_password("!a_valid--pas$word%", "!a_valid--pas$word%") == None
     assert check_registration_password("1234", "1234") == None
     assert check_registration_password("my_n3w_pa55w0rd", "my_n3w_pa55w0rd") == None
