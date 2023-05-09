@@ -79,6 +79,9 @@ def check_password(password):
     if len(password) > 20:
         return "Password cannot be longer than 20 characters. Try again."
     
+    if "<" in password or ">" in password or "(" in password or ")" in password or ";" in password:
+        return "Password cannot contain any of these characters: <>();"
+    
     # password is valid - returning no errors
     return None
 
@@ -127,6 +130,7 @@ def login():
             # trying to load user from database
             user_retrieved = user_repository.get_one(database_connection.connect(), username_entered) 
             
+            print(password_entered.encode('utf-8'))
             # checking user exists and password matches database
             if user_retrieved and bcrypt.checkpw(password_entered.encode('utf-8'), user_retrieved.password.encode('utf-8')):
                 
