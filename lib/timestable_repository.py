@@ -1,7 +1,3 @@
-from lib.user import User
-from lib.timestable import Timestable
-from lib.factor_learned import FactorLearned
-
 class TimestableRepository:
     # the timestable object that's passed in here should have the new medal already saved
     def update_medal(self, connection, user, timestable):
