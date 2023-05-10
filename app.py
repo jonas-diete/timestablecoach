@@ -19,9 +19,6 @@ database_connection = DatabaseConnection()
 # creating user repository object
 user_repository = UserRepository()
 
-# defining global user variable, that stores all the user data
-# user = False
-
 # converts the tt, which is an int written in the url, into a timestable name to use within our user object
 def convert_number_to_timestable(number):
     converter = {'2':'twos', '3':'threes', '4':'fours', '5':'fives', '6':'sixes', '7':'sevens', '8':'eights', '9':'nines', '10':'tens', '11':'elevens', '12':'twelves'}
