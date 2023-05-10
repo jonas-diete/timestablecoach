@@ -26,6 +26,15 @@ footer {
     clear: both;
 }
 
+a, a:visited {
+    color: #309901;
+    text-decoration: none;
+}
+
+a:hover, a:active {
+    color: #5cdd20;
+}
+
 input {
     background-color:cyan;
 }
