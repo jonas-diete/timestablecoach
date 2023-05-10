@@ -105,6 +105,16 @@ def check_registration_details(username, password1, password2, cookies, terms_an
     # no errors returned
     return None
 
+def create_new_timestables():
+    timestables = {}
+    timestables_names = ['twos', 'threes', 'fours', 'fives', 'sixes', 'sevens', 'eights', 'nines', 'tens', 'elevens', 'twelves']
+    for name in timestables_names:
+        factors_learned = {}
+        for i in range(1, 13):
+            factors_learned[i] = FactorLearned(i)
+        timestables[name] = Timestable(name, factors_learned)
+    return timestables
+
 @app.route("/")
 def index():
     return redirect("/login")
@@ -178,26 +188,14 @@ def register():
         encoded_pw = new_pw1.encode('utf-8')
         hashed_password = bcrypt.hashpw(encoded_pw, salt)
 
-        # connecting with database
-        connection = database_connection.connect()
-        
-        # creating a user object, filling it with TimesTable objects and those with FactorsLearned objects
-        timestables = {}
-        timestables_names = ['twos', 'threes', 'fours', 'fives', 'sixes', 'sevens', 'eights', 'nines', 'tens', 'elevens', 'twelves']
-        for name in timestables_names:
-            factors_learned = {}
-            for i in range(1, 13):
-                factors_learned[i] = FactorLearned(i)
-            timestables[name] = Timestable(name, factors_learned)
-
-        # creating new user
+        # creating new user with new timestables dict
+        timestables = create_new_timestables()
         new_user = User(new_username, hashed_password.decode(encoding='UTF-8'), timestables)
 
         # saving new user in database and
-        # updating the user object with the correct ids generated from the database
+        # saving created user in session cookie with newly generated ids
+        connection = database_connection.connect()
         session["user"] = jsonpickle.encode(user_repository.create(connection, new_user))
-
-        # closing database connection
         connection.close()
 
         return redirect("/select")
