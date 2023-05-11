@@ -2,7 +2,7 @@
 
 This is a web app that teaches children their multiplication tables.
 I developed this app myself in late 2021 and have been revisiting it after finishing my Makers Academy Coding bootcamp.
-I am currently refactoring some functions to improve the code quality
+I am currently working on a record time system to see the highscores for each timestable by different players.
 
 ### Tech Used
 
