@@ -23,6 +23,8 @@ Here is a video where I am introducing the app:
 
 ### Development
 
+06/05/2023 - Added pytest and wrote lots of unit tests for functions in app.py
+
 19/02/2023 - Lots of refactoring in app.py, abstracting checks for username and password into separate functions.
 
 09/01/2023 - I have spent the last couple of weeks setting up a PostgreSQL database and linked it with the project. Now all the user data, information about medals and which timestables have been learned are saved securely via bit.io.  
