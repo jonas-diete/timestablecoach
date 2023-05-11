@@ -23,6 +23,8 @@ Here is a video where I am introducing the app:
 
 ### Development
 
+08/05/2023 - Added playwright and wrote a few tests checking login is working correctly
+
 06/05/2023 - Added pytest and wrote lots of unit tests for functions in app.py
 
 19/02/2023 - Lots of refactoring in app.py, abstracting checks for username and password into separate functions.
