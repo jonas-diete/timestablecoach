@@ -23,6 +23,8 @@ Here is a video where I am introducing the app:
 
 ### Development
 
+12/05/2023 - Rewrote functions to display timer, using requestAnimationFrame instead of setInterval, allowing more precision. Now the time records and displays correctly up to 1/100 of a second.
+
 08/05/2023 - Added playwright and wrote a few tests checking login is working correctly
 
 06/05/2023 - Added pytest and wrote lots of unit tests for functions in app.py
