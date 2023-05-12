@@ -179,9 +179,6 @@
             document.querySelector('#answer').style.backgroundImage = "url('/static/images/answerbox_inactive.png')";
             document.querySelector('#main_button').style.display = 'block';
             document.querySelector('#main_button').innerHTML = 'Play Again';
-
-            // Stopping timer
-            // clearInterval(timer);
             
             // Resetting other variables
             shuffle(factors);
@@ -192,72 +189,7 @@
             wrong_questions = [tt]; //emptying wrong_questions except for tt
         }
 
-        
-        // function change_time() {        
-        //     if (game_started == true) {
-                
-        //         time--;
-                
-        //         // Shrinking the timer bar, every tenth of a second
-        //         document.querySelector('#timerbar').style.height = (initial_height / 300 * (time)) + 'px';
-        //         console.log(initial_height);
-        //         document.querySelector('#timerbar').style.top = (initial_top + (initial_height / 300 * (300-time))) + 'px';
-        //         let timeDisplayed = document.querySelector('#timer');
-        //         // Updating the timer every second
-        //         if (time % 10 == 0 && time != 0) {
-        //             if (time > 90) {
-        //               timeDisplayed.innerHTML = '0:' + (time / 10);
-        //             }
-        //             else if (time > 0) {
-        //               timeDisplayed.innerHTML = '0:0' + (time / 10);
-        //             }
-        //         }
-        //         else if (time == 0) {
-        //           timeDisplayed.innerHTML = '0:00';
-        //           finish();
-        //         }
-        //     }
-            
-        // }
-
-        // // Is called every 10ms (hundredth of a second)
-        // function change_time() {        
-        //     if (game_started == true) {
-                
-        //         time--;
-                
-        //         // Shrinking the timer bar, every tenth of a second
-        //         // document.querySelector('#timerbar').style.height = (initial_height / 3000 * (time)) + 'px';
-        //         // console.log(initial_height);
-        //         // document.querySelector('#timerbar').style.top = (initial_top + (initial_height / 3000 * (3000-time))) + 'px';
-                
-        //         let timeDisplayed = document.querySelector('#timer');
-                
-        //         // Updating the timer every second
-        //         if (time != 0) {
-        //             let seconds = parseInt(time / 100)
-        //             let hundredths = time - (seconds * 100)
-        //             if (hundredths < 10) {
-        //                 hundredths = '0' + hundredths
-        //             }
-        //             if (time > 999) {
-        //                 timeDisplayed.innerHTML = `${seconds}:${hundredths}`;
-        //             }
-        //             else if (time > 99) {
-        //               timeDisplayed.innerHTML = `0${seconds}:${hundredths}`;
-        //             }
-        //             else if (time > 9) {
-        //               timeDisplayed.innerHTML = `00:${hundredths}`;
-        //             }
-        //         }
-        //         else {
-        //           timeDisplayed.innerHTML = '00:00';
-        //           finish();
-        //         }
-        //     }
-            
-        // }
-    
+        // Called whenever the page is redrawn via requestAnimationFrame
         const changeTimer = () => {
             if (game_started == true) {
 
