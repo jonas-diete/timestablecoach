@@ -113,8 +113,6 @@
                 
                 return true;    // So we know an answer has been checked          
             }
-            
-
         }
 
         function displayFinalMessage(fontSize, message, imagePath, medal) {
@@ -124,6 +122,14 @@
           document.querySelector('#display').style.display = 'block';
           document.querySelector('#medalpic').style.display = 'block';
           medal_earned = medal;
+        }
+
+        function sendMedalResult(medal) {
+            var data = new FormData();
+            data.append('medal_earned', medal);
+            var request = new XMLHttpRequest();
+            request.open('POST', '/test/' + tt);
+            request.send(data);
         }
 
         function finish() {
@@ -143,36 +149,34 @@
             // gold
             if (num_of_corr_answers > 11 && timeRemaining > 499) {
               displayFinalMessage('1.15em', '<br><br>Congratulations.<br>You earned a gold medal!', '/static/images/gold.png', 3);
+              sendMedalResult(3);
             }
             // silver
             else if (num_of_corr_answers > 11) {
               displayFinalMessage('1.15em', '<br>Congratulations.<br>You earned a silver medal!', '/static/images/silver.png', 2);
+              sendMedalResult(2);
             }
             // bronze - too slow
             else if (num_of_corr_answers > 9 && timeRemaining == 0) {
               displayFinalMessage('1em', '<br>Congratulations.<br>You earned a bronze medal.<br>Keep on practising<br>to get faster.', '/static/images/bronze.png', 1);
+              sendMedalResult(1);
             }
             // bronze - 1 question wrong
             else if (num_of_corr_answers > 10) {
               displayFinalMessage('0.8em', '<br>Congratulations.<br>You earned a bronze medal.<br>Revise this question:<br>' + wrong_questions[1] + ' x ' + tt + ' = ' + wrong_questions[1]*tt, '/static/images/bronze.png', 1);
+              sendMedalResult(1);
             }
             // bronze - 2 questions wrong
             else if (num_of_corr_answers > 9) {
               displayFinalMessage('0.8em', '<br>Congratulations.<br>You earned a bronze medal.<br>Revise these questions:<br>' + wrong_questions[1] + ' x ' + tt + ' = ' + wrong_questions[1]*tt + '<br>' + wrong_questions[2] + ' x ' + tt + ' = ' + wrong_questions[2]*tt, '/static/images/bronze.png', 1);
+              sendMedalResult(1);
             }
+            
             // no medal
             else {
                 document.querySelector('#text').style.fontSize = '1em';
                 document.querySelector('#text').innerHTML = 'You got ' + num_of_corr_answers + ' out of 12 answers correct.<br>Keep on practising.';
             }
-
-            // Sending the medal result
-            var data = new FormData();
-            data.append('medal_earned', medal_earned);
-            var request = new XMLHttpRequest();
-            request.open('POST', '/test/' + tt);
-            request.send(data);
-
 
             // Disabling answer text box, displaying start button
             document.querySelector('#answer').disabled = true;
