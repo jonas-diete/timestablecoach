@@ -9,14 +9,12 @@ function shuffle(array) {
     return array;
 }
 
-function resetting() {
-    
-}
+
 // Creating and shuffling factor array
 var factors = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 shuffle(factors);
 
-// Initialising other variables
+// Initialising other global variables
 var question_number = 0;
 var num_of_corr_answers = 0;
 var game_started = false;
@@ -24,6 +22,23 @@ var timeRemaining = 3000;
 var startTime;     
 var wrong_questions = [];
 var medal_earned = 0;
+
+function resetVariables() {
+    shuffle(factors);
+    medal_earned = 0;
+    question_number = 0;
+    num_of_corr_answers = 0;
+    game_started = false;
+    wrong_questions = [tt]; //emptying wrong_questions except for tt
+}
+
+function resetStartButton() {
+    // Disabling answer text box, displaying start button
+    document.querySelector('#answer').disabled = true;
+    document.querySelector('#answer').style.backgroundImage = "url('/static/images/answerbox_inactive.png')";
+    document.querySelector('#main_button').style.display = 'block';
+    document.querySelector('#main_button').innerHTML = 'Play Again';
+}
 
 function create_question() {
     
@@ -172,19 +187,8 @@ function finish() {
         document.querySelector('#text').innerHTML = 'You got ' + num_of_corr_answers + ' out of 12 answers correct.<br>Keep on practising.';
     }
 
-    // Disabling answer text box, displaying start button
-    document.querySelector('#answer').disabled = true;
-    document.querySelector('#answer').style.backgroundImage = "url('/static/images/answerbox_inactive.png')";
-    document.querySelector('#main_button').style.display = 'block';
-    document.querySelector('#main_button').innerHTML = 'Play Again';
-    
-    // Resetting other variables
-    shuffle(factors);
-    medal_earned = 0;
-    question_number = 0;
-    num_of_corr_answers = 0;
-    game_started = false;
-    wrong_questions = [tt]; //emptying wrong_questions except for tt
+    resetStartButton();    
+    resetVariables();
 }
 
 // Called whenever the page is redrawn via requestAnimationFrame
