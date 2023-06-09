@@ -15,6 +15,7 @@ class TableCreator:
             bronze BOOLEAN,
             silver BOOLEAN,
             gold BOOLEAN,
+            personal_best INT,
             times_learned int[],
             user_id INT NOT NULL,
             CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(id)

@@ -18,6 +18,7 @@ shuffle(factors);
 var question_number = 0;
 var num_of_corr_answers = 0;
 var game_started = false;
+var timePassed = 0;
 var timeRemaining = 3000;   
 var startTime;     
 var wrong_questions = [];
@@ -28,7 +29,6 @@ function resetVariables() {
     medal_earned = 0;
     question_number = 0;
     num_of_corr_answers = 0;
-    game_started = false;
     wrong_questions = [tt]; //emptying wrong_questions except for tt
 }
 
@@ -134,15 +134,19 @@ function displayFinalMessage(fontSize, message, imagePath, medal) {
   medal_earned = medal;
 }
 
-function sendMedalResult(medal) {
+function sendMedalResult(medal, timeAchieved=0) {
     var data = new FormData();
     data.append('medal_earned', medal);
+    if (timeAchieved > 0) {
+        data.append('time_achieved', timeAchieved);
+    }  
     var request = new XMLHttpRequest();
     request.open('POST', '/test/' + tt);
     request.send(data);
 }
 
 function finish() {
+    game_started = false;
     // Checking if the last question was answered or time ran out (in which case it counts as wrong)
     if (question_number == 11 && timeRemaining == 0) {
         wrong_questions.push(factors[question_number]);
@@ -159,7 +163,7 @@ function finish() {
     // gold
     if (num_of_corr_answers > 11 && timeRemaining > 499) {
       displayFinalMessage('1.15em', '<br><br>Congratulations.<br>You earned a gold medal!', '/static/images/gold.png', 3);
-      sendMedalResult(3);
+      sendMedalResult(3, timePassed);
     }
     // silver
     else if (num_of_corr_answers > 11) {
@@ -200,7 +204,7 @@ const changeTimer = () => {
     document.querySelector('#timerbar').style.top = (initial_top + (initial_height / 3000 * (3000 - timeRemaining))) + 'px';
 
         let currentTime = new Date().getTime();
-        let timePassed = Math.floor((currentTime - startTime) / 10);
+        timePassed = Math.floor((currentTime - startTime) / 10);
         timeRemaining = 3000 - timePassed;
 
         let timeDisplayed = document.querySelector('#timer');

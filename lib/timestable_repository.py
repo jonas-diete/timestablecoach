@@ -4,13 +4,14 @@ class TimestableRepository:
         cursor = connection.cursor()
 
         if timestable.gold == True:
-            sql = '''UPDATE timestables SET gold = true WHERE user_id = %s AND name = %s'''
+            sql = '''UPDATE timestables SET gold = true WHERE user_id = %s AND name = %s;
+            UPDATE timestables SET personal_best = %s WHERE user_id = %s AND name = %s;'''
         elif timestable.silver == True:
             sql = '''UPDATE timestables SET silver = true WHERE user_id = %s AND name = %s'''
         elif timestable.bronze == True:
             sql = '''UPDATE timestables SET bronze = true WHERE user_id = %s AND name = %s'''
         
-        cursor.execute(sql, (user.id, timestable.name))
+        cursor.execute(sql, (user.id, timestable.name, timestable.personal_best, user.id, timestable.name))
         
         connection.commit()
         cursor.close()

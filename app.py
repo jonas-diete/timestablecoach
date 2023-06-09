@@ -252,8 +252,15 @@ def test(tt):
             timestable = convert_number_to_timestable(tt)
             # Receiving which medal was won, when timestable test was completed
             medal_earned = request.form.get("medal_earned")
+            time_achieved = request.form.get("time_achieved")
             if medal_earned == '3':
                 user.timestables[timestable].gold = True
+                # checking if a new pb was achieved
+                if user.timestables[timestable].personal_best == 0 or time_achieved < user.timestables[timestable].personal_best:
+                    user.timestables[timestable].personal_best = time_achieved
+                    print("New PB:" + time_achieved)
+                else:
+                    print("No new PB.")
             elif medal_earned == '2':
                 user.timestables[timestable].silver = True
             elif medal_earned == '1':
