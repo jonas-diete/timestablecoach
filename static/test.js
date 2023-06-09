@@ -205,25 +205,25 @@ const changeTimer = () => {
 
         let timeDisplayed = document.querySelector('#timer');
 
-        if (timeRemaining > 0) {
-            let seconds = Math.floor(timeRemaining / 100)
-            let hundredths = timeRemaining - (seconds * 100)
+        if (timePassed < 3000) {
+            let seconds = Math.floor(timePassed / 100)
+            let hundredths = timePassed - (seconds * 100)
             if (hundredths < 10) {
                 hundredths = '0' + hundredths
             }
-            if (timeRemaining > 999) {
+            if (timePassed > 999) {
                 timeDisplayed.innerHTML = `${seconds}:${hundredths}`;
             }
-            else if (timeRemaining > 99) {
+            else if (timePassed > 99) {
             timeDisplayed.innerHTML = `0${seconds}:${hundredths}`;
             }
-            else if (timeRemaining > 9) {
+            else if (timePassed > 9) {
             timeDisplayed.innerHTML = `00:${hundredths}`;
             }
         }
         else {
-            timeRemaining = 0;
-            timeDisplayed.innerHTML = '00:00';
+            timePassed = 3000;
+            timeDisplayed.innerHTML = '30:00';
             finish();
         }
 
