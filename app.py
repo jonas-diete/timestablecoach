@@ -40,19 +40,21 @@ def check_registration_username(username):
     return None
 
 def check_username(username):
-    # Checking if username is alphanumeric
-    if not username.isalnum():
-        return "Only letters or numbers allowed for username. Try again."
+    # if username exists
+    if username:
+        # Checking if username is alphanumeric
+        if not username.isalnum():
+            return "Only letters or numbers allowed for username. Try again."
     
-    # Checking if username has at least 2 characters
-    if len(username) < 2:
-        return "Please enter a longer username."
+        # Checking if username has at least 2 characters
+        if len(username) < 2:
+            return "Please enter a longer username."
 
-    # Checking if username has at most 15 characters
-    if len(username) > 15:
-        return "Please enter a shorter username."
+        # Checking if username has at most 15 characters
+        if len(username) > 15:
+            return "Please enter a shorter username."
 
-    # username is valid - returning no errors
+        # username is valid - returning no errors
     return None
 
 def check_registration_password(password1, password2):
