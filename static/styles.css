@@ -254,6 +254,15 @@ input[type=text]:focus, input[type=password]:focus {
     margin: 0;
 }
 
+.pb_container {
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+    font-size: 18px;
+    letter-spacing: 2px;
+    margin: 10px 5px 15px 5px;
+    padding: 0px 5px;
+}
+
 /* Hiding radio buttons - displaying just the radio_label that users can select*/
 [type=radio] { 
     position: absolute;

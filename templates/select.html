@@ -17,15 +17,26 @@
                 }
             });
 
-            let medals_str = document.querySelector('#medals_data').innerHTML;
+            let personalBestsStr = '{{ personal_bests }}';
+            let personalBests = personalBestsStr.split(' ');
+
+            let medalsStr = document.querySelector('#medals_data').innerHTML;
             for (i = 0; i < 11; i ++) {
-                if (medals_str[i] > 0) {
+                let personalBest = personalBests[i];
+                if (personalBest == '0') {
+                    personalBest = '--';
+                } else {
+                    personalBest = personalBest.slice(0, 2) + ':' + personalBest.slice(2);
+                }
+                document.getElementById((i + 2) + 'x_personal_best').innerHTML = personalBest;
+                
+                if (medalsStr[i] > 0) {
                     document.getElementById((i + 2) + 'x_bronze').style.opacity = '100%';
                 }
-                if (medals_str[i] > 1) {
+                if (medalsStr[i] > 1) {
                     document.getElementById((i + 2) + 'x_silver').style.opacity = '100%';
                 }
-                if (medals_str[i] > 2) {
+                if (medalsStr[i] > 2) {
                     document.getElementById((i + 2) + 'x_gold').style.opacity = '100%';
                 }
             }
@@ -62,6 +73,9 @@
                     <div class="medal_container">
                         <img src="/static/images/gold.png" class="medal_img" id="2x_gold">
                     </div>
+                    <div class="pb_container">
+                        <div id="2x_personal_best">--</div>
+                    </div>
                 </div>
 
                 {% for i in tts %}
@@ -78,6 +92,9 @@
                     </div>
                     <div class="medal_container">
                         <img src="/static/images/gold.png" class="medal_img" id="{{ i }}x_gold">
+                    </div>
+                    <div class="pb_container">
+                        <div id="{{ i }}x_personal_best">--</div>
                     </div>
                 </div>
                 {% endfor %}

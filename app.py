@@ -228,6 +228,7 @@ def select():
         elif request.method == "GET":
             timestables_names = ['twos', 'threes', 'fours', 'fives', 'sixes', 'sevens', 'eights', 'nines', 'tens', 'elevens', 'twelves']
             user_medals_str = ""
+            personal_bests = ""
             for timestable_name in timestables_names:
                 user = jsonpickle.decode(session["user"])
                 if user.timestables[timestable_name].gold == True:
@@ -238,9 +239,10 @@ def select():
                     user_medals_str += '1'
                 else:
                     user_medals_str += '0'
+                personal_bests += str(user.timestables[timestable_name].personal_best) + " "
 
             # Loading page
-            return render_template("select.html", username = user.username, tts = range(3, 13), medals = user_medals_str)                
+            return render_template("select.html", username = user.username, tts = range(3, 13), medals = user_medals_str, personal_bests = personal_bests)                
 
 @app.route("/test/<tt>", methods=["GET", "POST"])
 def test(tt):
@@ -260,9 +262,6 @@ def test(tt):
                 # checking if a new pb was achieved
                 if user.timestables[timestable].personal_best == 0 or time_achieved < user.timestables[timestable].personal_best:
                     user.timestables[timestable].personal_best = time_achieved
-                    print("New PB:" + time_achieved)
-                else:
-                    print("No new PB.")
             elif medal_earned == '2':
                 user.timestables[timestable].silver = True
             elif medal_earned == '1':
